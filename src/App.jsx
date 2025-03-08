@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
   const [mediaType, setMediaType] = useState(true); // true = film, false = serie TV
@@ -14,8 +14,8 @@ function App() {
   const [error, setError] = useState(null);
   const [viewedMedia, setViewedMedia] = useState([]);
 
-  const API_KEY = "d8d1e982f6cd7a2fe927be7ba4c903f1";
-  const BASE_URL = "https://api.themoviedb.org/3";
+  const API_KEY = 'd8d1e982f6cd7a2fe927be7ba4c903f1';
+  const BASE_URL = 'https://api.themoviedb.org/3';
 
   // Carica i generi quando il componente viene montato
   useEffect(() => {
@@ -33,19 +33,18 @@ function App() {
 
         // Combina i generi unici da film e serie TV
         const allGenres = [...movieGenresData.genres, ...tvGenresData.genres];
-        const uniqueGenres = Array.from(new Set(allGenres.map(g => g.id)))
-          .map(id => {
-            return allGenres.find(g => g.id === id);
-          });
+        const uniqueGenres = Array.from(new Set(allGenres.map((g) => g.id))).map((id) => {
+          return allGenres.find((g) => g.id === id);
+        });
 
         setGenres(uniqueGenres);
       } catch (err) {
-        setError("Errore nel caricamento dei generi");
+        setError('Errore nel caricamento dei generi');
         console.error(err);
       }
     };
 
-    fetchGenres();
+    fetchGenres().then(() => console.log('Ottenuti i generi'));
   }, []);
 
   // Genera un film o serie TV casuale in base ai filtri
@@ -54,17 +53,19 @@ function App() {
     setError(null);
 
     try {
-      const mediaTypeStr = mediaType ? "movie" : "tv";
-      const genreParam = selectedGenres.length > 0 ? `&with_genres=${selectedGenres.join(",")}` : "";
+      const mediaTypeStr = mediaType ? 'movie' : 'tv';
+      const genreParam =
+        selectedGenres.length > 0 ? `&with_genres=${selectedGenres.join(',')}` : '';
 
       // Ottieni il numero totale di pagine per la ricerca
+      // Aggiungiamo with_original_language=it per prioritizzare contenuti italiani
       const discoverUrl = `${BASE_URL}/discover/${mediaTypeStr}?api_key=${API_KEY}&language=it-IT&vote_average.gte=${minRating}&vote_average.lte=${maxRating}${genreParam}&primary_release_date.gte=${releaseYearFrom}-01-01&primary_release_date.lte=${releaseYearTo}-12-31`;
 
       const response = await fetch(`${discoverUrl}&page=1`);
       const data = await response.json();
 
       if (data.total_results === 0) {
-        setError("Nessun risultato trovato con questi filtri");
+        setError('Nessun risultato trovato con questi filtri');
         setIsLoading(false);
         return;
       }
@@ -78,18 +79,23 @@ function App() {
       const pageData = await pageResponse.json();
 
       // Filtra i media che non sono già stati visualizzati
+      // E aggiungiamo un filtro per contenuti con overview in italiano
       const filteredResults = pageData.results.filter(
-        media => !viewedMedia.some(viewed => viewed.id === media.id)
+        (media) =>
+          !viewedMedia.some((viewed) => viewed.id === media.id) &&
+          media.overview &&
+          media.overview.trim() !== '' &&
+          media.overview !== 'Nessuna descrizione disponibile in italiano.'
       );
 
       if (filteredResults.length === 0) {
-        // Se tutti i risultati in questa pagina sono già stati visti, riprova
+        // Se tutti i risultati in questa pagina sono già stati visti o non hanno descrizione italiana, riprova
         if (viewedMedia.length > 500) {
           // Reset della cronologia se abbiamo visto troppi media
           setViewedMedia([]);
         }
         setIsLoading(false);
-        generateRandomMedia();
+        await generateRandomMedia();
         return;
       }
 
@@ -103,29 +109,43 @@ function App() {
       );
       const detailsData = await detailsResponse.json();
 
+      // Verifica finale che il contenuto abbia una descrizione in italiano
+      if (
+        !detailsData.overview ||
+        detailsData.overview.trim() === '' ||
+        detailsData.overview === 'Nessuna descrizione disponibile in italiano.'
+      ) {
+        // Se non ha descrizione, riprova con un altro media
+        setIsLoading(false);
+        await generateRandomMedia();
+        return;
+      }
+
       setRandomMedia(detailsData);
-      setViewedMedia(prevViewedMedia => [...prevViewedMedia, detailsData]);
+      setViewedMedia((prevViewedMedia) => [...prevViewedMedia, detailsData]);
     } catch (err) {
-      setError("Si è verificato un errore. Riprova più tardi.");
+      setError('Si è verificato un errore. Riprova più tardi.');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   // Gestisce il toggle dei generi selezionati
   function handleGenreToggle(genreId) {
-    setSelectedGenres(prevSelected =>
+    setSelectedGenres((prevSelected) =>
       prevSelected.includes(genreId)
-        ? prevSelected.filter(id => id !== genreId)
+        ? prevSelected.filter((id) => id !== genreId)
         : [...prevSelected, genreId]
     );
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">Generatore Random di {mediaType ? "Film" : "Serie TV"}</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Generatore Random di {mediaType ? 'Film' : 'Serie TV'}
+        </h1>
 
         {/* Selezione del tipo di media */}
         <div className="mb-6">
@@ -210,7 +230,7 @@ function App() {
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-2">Generi</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {genres.map(genre => (
+            {genres.map((genre) => (
               <label key={genre.id} className="inline-flex items-center">
                 <input
                   type="checkbox"
@@ -231,16 +251,12 @@ function App() {
             disabled={isLoading}
             className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400"
           >
-            {isLoading ? "Caricamento..." : "Genera Casualmente"}
+            {isLoading ? 'Caricamento...' : 'Genera Casualmente'}
           </button>
         </div>
 
         {/* Messaggio di errore */}
-        {error && (
-          <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
+        {error && <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
 
         {/* Card del risultato */}
         {randomMedia && !isLoading && (
@@ -284,25 +300,28 @@ function App() {
 
                   {randomMedia.genres && randomMedia.genres.length > 0 && (
                     <span className="text-gray-600">
-                      {randomMedia.genres.map(g => g.name).join(", ")}
+                      {randomMedia.genres.map((g) => g.name).join(', ')}
                     </span>
                   )}
                 </div>
 
                 <p className="text-gray-700 mb-4">
-                  {randomMedia.overview || "Nessuna descrizione disponibile in italiano."}
+                  {randomMedia.overview || 'Nessuna descrizione disponibile in italiano.'}
                 </p>
 
                 {/* Dettagli aggiuntivi */}
                 {mediaType ? (
                   <div className="text-sm text-gray-600">
-                    <p>Durata: {randomMedia.runtime ? `${randomMedia.runtime} min` : "N/D"}</p>
-                    <p>Produzione: {randomMedia.production_companies?.map(p => p.name).join(", ") || "N/D"}</p>
+                    <p>Durata: {randomMedia.runtime ? `${randomMedia.runtime} min` : 'N/D'}</p>
+                    <p>
+                      Produzione:{' '}
+                      {randomMedia.production_companies?.map((p) => p.name).join(', ') || 'N/D'}
+                    </p>
                   </div>
                 ) : (
                   <div className="text-sm text-gray-600">
-                    <p>Stagioni: {randomMedia.number_of_seasons || "N/D"}</p>
-                    <p>Episodi: {randomMedia.number_of_episodes || "N/D"}</p>
+                    <p>Stagioni: {randomMedia.number_of_seasons || 'N/D'}</p>
+                    <p>Episodi: {randomMedia.number_of_episodes || 'N/D'}</p>
                   </div>
                 )}
               </div>
@@ -319,4 +338,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
