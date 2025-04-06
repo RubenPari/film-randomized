@@ -5,6 +5,7 @@ function App() {
   const [mediaType, setMediaType] = useState(true); // true = film, false = serie TV
   const [minRating, setMinRating] = useState(0);
   const [maxRating, setMaxRating] = useState(10);
+  const [minVoteCount, setMinVoteCount] = useState(0); // Nuovo stato per il numero minimo di valutazioni
   const [releaseYearFrom, setReleaseYearFrom] = useState(1900);
   const [releaseYearTo, setReleaseYearTo] = useState(new Date().getFullYear());
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -59,7 +60,7 @@ function App() {
 
       // Ottieni il numero totale di pagine per la ricerca
       // Aggiungiamo with_original_language=it per prioritizzare contenuti italiani
-      const discoverUrl = `${BASE_URL}/discover/${mediaTypeStr}?api_key=${API_KEY}&language=it-IT&vote_average.gte=${minRating}&vote_average.lte=${maxRating}${genreParam}&primary_release_date.gte=${releaseYearFrom}-01-01&primary_release_date.lte=${releaseYearTo}-12-31`;
+      const discoverUrl = `${BASE_URL}/discover/${mediaTypeStr}?api_key=${API_KEY}&language=it-IT&vote_average.gte=${minRating}&vote_average.lte=${maxRating}&vote_count.gte=${minVoteCount}${genreParam}&primary_release_date.gte=${releaseYearFrom}-01-01&primary_release_date.lte=${releaseYearTo}-12-31`;
 
       const response = await fetch(`${discoverUrl}&page=1`);
       const data = await response.json();
@@ -197,6 +198,28 @@ function App() {
           </div>
         </div>
 
+        {/* Filtro per numero minimo di valutazioni */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-2">Numero minimo di valutazioni</h2>
+          <div className="flex items-center">
+            <select
+              value={minVoteCount}
+              onChange={(e) => setMinVoteCount(parseInt(e.target.value))}
+              className="border rounded px-3 py-2 w-32"
+            >
+              <option value="0">0 (nessun limite)</option>
+              <option value="500">500</option>
+              <option value="1000">1000</option>
+              <option value="2500">2500</option>
+              <option value="5000">5000</option>
+              <option value="10000">10000</option>
+            </select>
+            <span className="ml-2 text-sm text-gray-600">
+              (valori più alti = film/serie più popolari)
+            </span>
+          </div>
+        </div>
+
         {/* Filtro per anno di uscita */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-2">Anno di Uscita</h2>
@@ -296,6 +319,10 @@ function App() {
                 <div className="flex items-center mb-3">
                   <span className="inline-block bg-blue-100 text-blue-800 font-semibold px-2 py-1 rounded mr-2">
                     Voto: {randomMedia.vote_average.toFixed(1)}/10
+                  </span>
+
+                  <span className="inline-block bg-green-100 text-green-800 font-semibold px-2 py-1 rounded mr-2">
+                    Valutazioni: {randomMedia.vote_count}
                   </span>
 
                   {randomMedia.genres && randomMedia.genres.length > 0 && (
