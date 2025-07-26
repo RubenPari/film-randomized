@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import PrivateRoute from './components/PrivateRoute.jsx';
 import { useMediaGenerator } from './hooks/useMediaGenerator.js';
 import MediaTypeSelector from './components/MediaTypeSelector.jsx';
 import RatingFilter from './components/RatingFilter.jsx';
@@ -9,11 +11,11 @@ import MediaCard from './components/MediaCard.jsx';
 import Watchlist from './components/Watchlist.jsx';
 
 /**
- * Main application component for the movie/TV show randomizer
- * Provides UI for filtering and displaying random media content
+ * Main content component (wrapped with authentication)
  */
-function App() {
+function MainContent() {
   const [showWatchlist, setShowWatchlist] = useState(false);
+  const { user, logout } = useAuth();
 
   const {
     mediaType,
@@ -47,26 +49,32 @@ function App() {
                 Generatore Random di {mediaType ? 'Film' : 'Serie TV'}
               </h1>
               <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
-                Scopri film e serie TV casuali in base ai tuoi gusti. Filtra per genere, anno e
-                valutazione per trovare il tuo prossimo intrattenimento preferito.
+                Scopri film e serie TV casuali in base ai tuoi gusti. Filtra per genere, anno e valutazione per trovare il tuo prossimo intrattenimento preferito.
               </p>
             </div>
-            <button
-              onClick={function () {
-                setShowWatchlist(true);
-              }}
-              className="ml-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg flex items-center gap-2 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                />
-              </svg>
-              Le mie liste
-            </button>
+            <div className="flex flex-col gap-2">
+              <div className="text-sm text-gray-400 text-right mb-2">
+                Ciao, {user.username}!
+              </div>
+              <button
+                onClick={function () { setShowWatchlist(true); }}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Le mie liste
+              </button>
+              <button
+                onClick={logout}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Esci
+              </button>
+            </div>
           </div>
         </header>
 
@@ -133,7 +141,9 @@ function App() {
             )}
 
             {/* Media card display */}
-            {randomMedia && !isLoading && <MediaCard media={randomMedia} mediaType={mediaType} />}
+            {randomMedia && !isLoading && (
+              <MediaCard media={randomMedia} mediaType={mediaType} />
+            )}
 
             {/* Viewed media counter */}
             {viewedMedia.length > 0 && (
@@ -147,13 +157,22 @@ function App() {
 
       {/* Watchlist modal */}
       {showWatchlist && (
-        <Watchlist
-          onClose={function () {
-            setShowWatchlist(false);
-          }}
-        />
+        <Watchlist onClose={function () { setShowWatchlist(false); }} />
       )}
     </div>
+  );
+}
+
+/**
+ * Main application component with authentication
+ */
+function App() {
+  return (
+    <AuthProvider>
+      <PrivateRoute>
+        <MainContent />
+      </PrivateRoute>
+    </AuthProvider>
   );
 }
 

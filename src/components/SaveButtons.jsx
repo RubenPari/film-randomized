@@ -12,15 +12,20 @@ function SaveButtons({ media }) {
   const [showMessage, setShowMessage] = useState('');
 
   // Check if media is already in lists when component mounts or media changes
-  useEffect(
-    function () {
+  useEffect(function () {
+    async function checkStatus() {
       if (media && media.id) {
-        setIsInToWatch(watchlistService.isInList(media.id, 'TO_WATCH'));
-        setIsInWatched(watchlistService.isInList(media.id, 'WATCHED'));
+        const [inToWatch, inWatched] = await Promise.all([
+          watchlistService.isInList(media.id, 'TO_WATCH'),
+          watchlistService.isInList(media.id, 'WATCHED')
+        ]);
+        setIsInToWatch(inToWatch);
+        setIsInWatched(inWatched);
       }
-    },
-    [media]
-  );
+    }
+
+    checkStatus();
+  }, [media]);
 
   // Show temporary message
   const showTempMessage = function (message) {
@@ -82,13 +87,17 @@ function SaveButtons({ media }) {
         {!isInWatched && (
           <button
             onClick={isInToWatch ? handleRemoveFromToWatch : handleAddToWatchlist}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              isInToWatch
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isInToWatch
                 ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-            }`}
+              }`}
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               {isInToWatch ? (
                 <path
                   strokeLinecap="round"
@@ -112,13 +121,17 @@ function SaveButtons({ media }) {
         {/* Watched Button */}
         <button
           onClick={isInWatched ? handleRemoveFromWatched : handleMarkAsWatched}
-          className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-            isInWatched
+          className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isInWatched
               ? 'bg-green-600 hover:bg-green-700 text-white'
               : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-          }`}
+            }`}
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
