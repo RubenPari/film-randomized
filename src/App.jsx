@@ -7,9 +7,14 @@ import YearFilter from './components/YearFilter.jsx';
 import GenreFilter from './components/GenreFilter.jsx';
 import MediaCard from './components/MediaCard.jsx';
 
+/**
+ * Main application component for the movie/TV show randomizer
+ * Provides UI for filtering and displaying random media content
+ */
 function App() {
+  // Get all state and functions from the custom hook
   const {
-    // State
+    // State values
     mediaType,
     minRating,
     maxRating,
@@ -21,7 +26,7 @@ function App() {
     isLoading,
     error,
     viewedMedia,
-    // Actions
+    // Action functions
     setMediaType,
     setMinRating,
     setMaxRating,
@@ -32,54 +37,92 @@ function App() {
   } = useMediaGenerator();
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Generatore Random di {mediaType ? 'Film' : 'Serie TV'}
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header section with title and description */}
+        <header className="text-center mb-10 py-8">
+          <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Generatore Random di {mediaType ? 'Film' : 'Serie TV'}
+          </h1>
+          <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
+            Scopri film e serie TV casuali in base ai tuoi gusti. Filtra per genere, anno e valutazione per trovare il tuo prossimo intrattenimento preferito.
+          </p>
+        </header>
 
-        <MediaTypeSelector mediaType={mediaType} setMediaType={setMediaType} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Filter section - left column */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="filter-section">
+              <MediaTypeSelector mediaType={mediaType} setMediaType={setMediaType} />
+            </div>
 
-        <RatingFilter
-          minRating={minRating}
-          maxRating={maxRating}
-          setMinRating={setMinRating}
-          setMaxRating={setMaxRating}
-        />
+            <div className="filter-section">
+              <RatingFilter
+                minRating={minRating}
+                maxRating={maxRating}
+                setMinRating={setMinRating}
+                setMaxRating={setMaxRating}
+              />
+            </div>
 
-        <YearFilter
-          releaseYearFrom={releaseYearFrom}
-          releaseYearTo={releaseYearTo}
-          setReleaseYearFrom={setReleaseYearFrom}
-          setReleaseYearTo={setReleaseYearTo}
-        />
+            <div className="filter-section">
+              <YearFilter
+                releaseYearFrom={releaseYearFrom}
+                releaseYearTo={releaseYearTo}
+                setReleaseYearFrom={setReleaseYearFrom}
+                setReleaseYearTo={setReleaseYearTo}
+              />
+            </div>
 
-        <GenreFilter
-          genres={genres}
-          selectedGenres={selectedGenres}
-          handleGenreToggle={handleGenreToggle}
-        />
+            <div className="filter-section">
+              <GenreFilter
+                genres={genres}
+                selectedGenres={selectedGenres}
+                handleGenreToggle={handleGenreToggle}
+              />
+            </div>
+          </div>
 
-        {/* Bottone per generare */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={generateRandomMedia}
-            disabled={isLoading}
-            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400"
-          >
-            {isLoading ? 'Caricamento...' : 'Genera Casualmente'}
-          </button>
-        </div>
+          {/* Results section - right column */}
+          <div className="lg:col-span-2">
+            {/* Generate button */}
+            <div className="text-center mb-8">
+              <button
+                onClick={generateRandomMedia}
+                disabled={isLoading}
+                className="btn-primary flex items-center mx-auto"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="loading-spinner mr-2"></div>
+                    Caricamento...
+                  </>
+                ) : (
+                  '_genera Contenuto Casuale'
+                )}
+              </button>
+            </div>
 
-        {/* Messaggio di errore */}
-        {error && <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
+            {/* Error message display */}
+            {error && (
+              <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-xl border border-red-700/50 backdrop-blur-sm">
+                <div className="font-bold mb-1">Errore</div>
+                <div>{error}</div>
+              </div>
+            )}
 
-        {/* Card del risultato */}
-        {randomMedia && !isLoading && <MediaCard media={randomMedia} mediaType={mediaType} />}
+            {/* Media card display */}
+            {randomMedia && !isLoading && (
+              <MediaCard media={randomMedia} mediaType={mediaType} />
+            )}
 
-        {/* Contatore di media visti */}
-        <div className="mt-4 text-center text-sm text-gray-500">
-          Media visualizzati in questa sessione: {viewedMedia.length}
+            {/* Viewed media counter */}
+            {viewedMedia.length > 0 && (
+              <div className="mt-6 text-center text-gray-400">
+                Hai scoperto {viewedMedia.length} contenuti in questa sessione
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
