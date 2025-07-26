@@ -1,25 +1,31 @@
 import React from 'react';
 
-const MediaTypeSelector = ({ mediaType, setMediaType }) => {
+/**
+ * Component for selecting between movies and TV shows
+ * @param {Object} props - Component props
+ * @param {boolean} props.mediaType - Current media type (true for movie, false for TV)
+ * @param {Function} props.setMediaType - Function to update media type
+ */
+function MediaTypeSelector({ mediaType, setMediaType }) {
   return (
-    <div className="mb-6">
-      <h2 className="text-lg font-semibold mb-2">Tipo di Media</h2>
-      <div className="flex space-x-4">
+    <div>
+      <h2 className="filter-title">Tipo di Media</h2>
+      <div className="flex space-x-3">
         <button
-          onClick={() => setMediaType(true)}
-          className={`px-4 py-2 rounded ${mediaType ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={function() { setMediaType(true); }}
+          className={`btn-secondary flex-1 ${mediaType ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
         >
           Film
         </button>
         <button
-          onClick={() => setMediaType(false)}
-          className={`px-4 py-2 rounded ${!mediaType ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={function() { setMediaType(false); }}
+          className={`btn-secondary flex-1 ${!mediaType ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
         >
           Serie TV
         </button>
       </div>
     </div>
   );
-};
+}
 
 export default MediaTypeSelector;
