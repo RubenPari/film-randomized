@@ -49,6 +49,13 @@
     .loading-spinner {
         @apply border-4 border-blue-500 border-t-transparent rounded-full w-8 h-8 animate-spin;
     }
+
+    .overview-clamped {
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 }
 
 @keyframes fade-in {

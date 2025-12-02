@@ -19,6 +19,12 @@ function MediaCard({ media, mediaType }) {
 
   // State for trailer video
   const [trailerKey, setTrailerKey] = useState(null);
+  const [isTrailerVisible, setIsTrailerVisible] = useState(false);
+
+  // State for description expansion
+  const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
+
+  const hasLongOverview = Boolean(media.overview && media.overview.length > 280);
 
   // Fetch trailer when component mounts or media changes
   useEffect(function() {
@@ -33,10 +39,12 @@ function MediaCard({ media, mediaType }) {
           setTrailerKey(trailer.key);
         } else {
           setTrailerKey(null);
+          setIsTrailerVisible(false);
         }
       } catch (error) {
         console.error('Errore nel caricamento del trailer:', error);
         setTrailerKey(null);
+        setIsTrailerVisible(false);
       }
     };
 
@@ -85,10 +93,12 @@ function MediaCard({ media, mediaType }) {
           </h2>
 
           {/* Rating and genres display */}
-          <div className="flex flex-wrap items-center mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="rating-badge">
               Voto: {media.vote_average.toFixed(1)}/10
-              <span className="ml-2 text-sm opacity-75">({media.vote_count.toLocaleString('it-IT')} voti)</span>
+            </span>
+            <span className="inline-block bg-gray-800 text-gray-200 text-sm font-medium px-3 py-1 rounded-full border border-gray-700">
+              {media.vote_count.toLocaleString('it-IT')} voti
             </span>
 
             {media.genres && media.genres.length > 0 && (
@@ -108,24 +118,56 @@ function MediaCard({ media, mediaType }) {
           </div>
 
           {/* Overview/description */}
-          <p className="text-gray-300 mb-6 leading-relaxed">
-            {media.overview || 'Nessuna descrizione disponibile in italiano.'}
-          </p>
+          <div className="mb-6">
+            <p
+              className={
+                'text-gray-300 leading-relaxed ' +
+                (!isOverviewExpanded && hasLongOverview ? 'overview-clamped' : '')
+              }
+            >
+              {media.overview || 'Nessuna descrizione disponibile in italiano.'}
+            </p>
+            {hasLongOverview && (
+              <button
+                type="button"
+                onClick={function() {
+                  setIsOverviewExpanded(function(prev) {
+                    return !prev;
+                  });
+                }}
+                className="mt-2 text-sm text-blue-400 hover:text-blue-300"
+              >
+                {isOverviewExpanded ? 'Mostra meno' : 'Mostra di più'}
+              </button>
+            )}
+          </div>
 
           {/* Trailer video player */}
           {trailerKey && (
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-3 text-white">Trailer</h3>
-              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full rounded-lg"
-                  src={`https://www.youtube.com/embed/${trailerKey}`}
-                  title="Trailer"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
+              {!isTrailerVisible ? (
+                <button
+                  type="button"
+                  onClick={function() {
+                    setIsTrailerVisible(true);
+                  }}
+                  className="btn-secondary bg-gray-800 text-gray-100 hover:bg-gray-700 border border-gray-700"
+                >
+                  Guarda il trailer
+                </button>
+              ) : (
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full rounded-lg"
+                    src={`https://www.youtube.com/embed/${trailerKey}`}
+                    title={`Trailer di ${title}`}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              )}
             </div>
           )}
 
