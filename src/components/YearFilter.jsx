@@ -14,6 +14,9 @@ function YearFilter({ releaseYearFrom, releaseYearTo, setReleaseYearFrom, setRel
   return (
     <div>
       <h2 className="filter-title">Anno di Uscita</h2>
+      <p className="text-sm text-gray-400 mb-3">
+        Scegli un intervallo di anni per limitare la ricerca.
+      </p>
       <div className="space-y-4">
         <div>
           <label className="block text-sm mb-1 text-gray-300">Da</label>
@@ -37,24 +40,6 @@ function YearFilter({ releaseYearFrom, releaseYearTo, setReleaseYearFrom, setRel
             className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-      </div>
-      <div className="mt-4 flex items-center space-x-4">
-        <input
-          type="range"
-          min="1900"
-          max={currentYear}
-          value={releaseYearFrom}
-          onChange={function(e) { setReleaseYearFrom(parseInt(e.target.value)); }}
-          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
-        />
-        <input
-          type="range"
-          min="1900"
-          max={currentYear}
-          value={releaseYearTo}
-          onChange={function(e) { setReleaseYearTo(parseInt(e.target.value)); }}
-          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500"
-        />
       </div>
       <div className="mt-2 flex justify-between text-sm text-gray-400">
         <span>1900</span>
