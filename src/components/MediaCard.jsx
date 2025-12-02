@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { IMAGE_BASE_URL } from '../constants/api.js';
+import { fetchMediaVideos } from '../services/tmdbApi.js';
 import SaveButtons from './SaveButtons.jsx';
 
 /**
@@ -15,6 +16,32 @@ function MediaCard({ media, mediaType }) {
   // Extract release date and year
   const releaseDate = media.release_date || media.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : null;
+
+  // State for trailer video
+  const [trailerKey, setTrailerKey] = useState(null);
+
+  // Fetch trailer when component mounts or media changes
+  useEffect(function() {
+    const loadTrailer = async function() {
+      try {
+        const videosData = await fetchMediaVideos(mediaType, media.id);
+        // Find the first YouTube trailer
+        const trailer = videosData.results?.find(function(video) {
+          return video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser');
+        });
+        if (trailer) {
+          setTrailerKey(trailer.key);
+        } else {
+          setTrailerKey(null);
+        }
+      } catch (error) {
+        console.error('Errore nel caricamento del trailer:', error);
+        setTrailerKey(null);
+      }
+    };
+
+    loadTrailer();
+  }, [media.id, mediaType]);
 
   return (
     <div className="media-card">
@@ -59,7 +86,10 @@ function MediaCard({ media, mediaType }) {
 
           {/* Rating and genres display */}
           <div className="flex flex-wrap items-center mb-4">
-            <span className="rating-badge">Voto: {media.vote_average.toFixed(1)}/10</span>
+            <span className="rating-badge">
+              Voto: {media.vote_average.toFixed(1)}/10
+              <span className="ml-2 text-sm opacity-75">({media.vote_count.toLocaleString('it-IT')} voti)</span>
+            </span>
 
             {media.genres && media.genres.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
@@ -81,6 +111,23 @@ function MediaCard({ media, mediaType }) {
           <p className="text-gray-300 mb-6 leading-relaxed">
             {media.overview || 'Nessuna descrizione disponibile in italiano.'}
           </p>
+
+          {/* Trailer video player */}
+          {trailerKey && (
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-white">Trailer</h3>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full rounded-lg"
+                  src={`https://www.youtube.com/embed/${trailerKey}`}
+                  title="Trailer"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          )}
 
           {/* Additional details based on media type */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
