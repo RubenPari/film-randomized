@@ -1,7 +1,7 @@
 // API configuration constants for The Movie Database (TMDb)
 
 // API key for accessing TMDb API
-export const API_KEY = 'd8d1e982f6cd7a2fe927be7ba4c903f1';
+export const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 // Base URL for all API requests
 export const BASE_URL = 'https://api.themoviedb.org/3';
@@ -25,5 +25,10 @@ export const API_ENDPOINTS = {
     // Endpoint for media details
     details: function(mediaType, id) { 
         return `${BASE_URL}/${mediaType}/${id}`; 
+    },
+    
+    // Endpoint for media videos/trailers
+    videos: function(mediaType, id) { 
+        return `${BASE_URL}/${mediaType}/${id}/videos`; 
     }
 };
