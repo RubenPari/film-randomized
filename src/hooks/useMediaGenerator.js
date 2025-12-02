@@ -13,6 +13,7 @@ export function useMediaGenerator() {
     const [maxRating, setMaxRating] = useState(10);
     const [releaseYearFrom, setReleaseYearFrom] = useState(1900);
     const [releaseYearTo, setReleaseYearTo] = useState(new Date().getFullYear());
+    const [minVoteCount, setMinVoteCount] = useState(0);
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [genres, setGenres] = useState([]);
     const [randomMedia, setRandomMedia] = useState(null);
@@ -53,7 +54,8 @@ export function useMediaGenerator() {
                 maxRating,
                 selectedGenres,
                 releaseYearFrom,
-                releaseYearTo
+                releaseYearTo,
+                minVoteCount
             };
 
             // Get discovery URL and total pages from TMDB API
@@ -126,6 +128,7 @@ export function useMediaGenerator() {
         maxRating,
         releaseYearFrom,
         releaseYearTo,
+        minVoteCount,
         selectedGenres,
         genres,
         randomMedia,
@@ -138,6 +141,7 @@ export function useMediaGenerator() {
         setMaxRating,
         setReleaseYearFrom,
         setReleaseYearTo,
+        setMinVoteCount,
         generateRandomMedia,
         handleGenreToggle
     };
