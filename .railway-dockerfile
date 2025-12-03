@@ -1,0 +1,2 @@
+# Force Railway to use Dockerfile
+# This file signals Railway to use Docker build instead of Railpack
