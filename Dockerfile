@@ -3,7 +3,7 @@
 # Stage 1: Build Frontend
 FROM node:20-alpine AS frontend-builder
 
-WORKDIR /app/frontend
+WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
@@ -11,8 +11,14 @@ COPY package*.json ./
 # Install dependencies
 RUN npm ci
 
-# Copy frontend source
-COPY . .
+# Copy frontend source (exclude backend)
+COPY src ./src
+COPY public ./public
+COPY index.html ./
+COPY vite.config.js ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
+COPY eslint.config.js ./
 
 # Build frontend
 RUN npm run build
@@ -38,7 +44,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 
 # Copy built frontend from previous stage
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+COPY --from=frontend-builder /app/dist ./frontend/dist
 
 # Expose port
 EXPOSE 8000
