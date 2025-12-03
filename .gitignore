@@ -28,3 +28,14 @@ dist-ssr
 !.env.project
 !.env.vault
 !.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
