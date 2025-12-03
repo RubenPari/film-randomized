@@ -1,9 +1,13 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import List
 import json
+import os
+from pathlib import Path
 
 from database import get_db, engine
 from models import Base, WatchlistItem
@@ -22,11 +26,16 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],  # Vite ports
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "*"],  # Allow all origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static files configuration for production
+FRONTEND_DIR = Path(__file__).parent.parent / "frontend" / "dist"
+if FRONTEND_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
 
 @app.get("/")
 def read_root():
@@ -118,6 +127,26 @@ def remove_from_watchlist(tmdb_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+# Serve frontend for all other routes (SPA support)
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """
+    Serve the frontend application for all non-API routes
+    """
+    if FRONTEND_DIR.exists():
+        file_path = FRONTEND_DIR / full_path
+        
+        # If file exists and is not a directory, serve it
+        if file_path.is_file():
+            return FileResponse(file_path)
+        
+        # Otherwise serve index.html for client-side routing
+        index_file = FRONTEND_DIR / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+    
+    raise HTTPException(status_code=404, detail="Not found")
 
 if __name__ == "__main__":
     import uvicorn
