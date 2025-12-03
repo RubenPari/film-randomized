@@ -55,7 +55,7 @@ function MediaCard({ media, mediaType }) {
     <div className="media-card">
       <div className="flex flex-col md:flex-row">
         {/* Poster section */}
-        <div className="md:w-1/3">
+        <div className="md:w-2/5">
           {media.poster_path ? (
             <img
               src={`${IMAGE_BASE_URL}${media.poster_path}`}
@@ -86,7 +86,7 @@ function MediaCard({ media, mediaType }) {
         </div>
 
         {/* Information section */}
-        <div className="md:w-2/3 p-6">
+        <div className="md:w-3/5 p-6">
           <h2 className="media-title">
             {title}
             {year && <span className="ml-2 text-gray-400 font-normal">({year})</span>}
