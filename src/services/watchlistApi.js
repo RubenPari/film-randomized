@@ -1,5 +1,8 @@
 const API_BASE_URL = import.meta.env.PROD ? '/api' : 'http://localhost:8000/api';
 
+// Debug log
+console.log('API_BASE_URL:', API_BASE_URL, 'PROD:', import.meta.env.PROD);
+
 /**
  * Add a media item to the watchlist
  * @param {Object} media - Media object with all details
