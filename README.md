@@ -203,28 +203,25 @@ Componenti piccoli e riutilizzabili per filtri e UI elements, garantendo manuten
 
 ### TMDb API Key
 
-La chiave API di TMDb è configurata in `src/constants/api.js`. Per utilizzare la tua chiave:
+Attenzione: **non inserire mai la tua API key TMDb direttamente nel codice sorgente** e non committarla nel repository.
 
-1. Ottieni una chiave API gratuita da [TMDb](https://www.themoviedb.org/settings/api)
-2. Modifica `src/constants/api.js`:
-
-```javascript
-export const API_KEY = "la-tua-chiave-api";
-```
-
-### Variabili d'Ambiente (Opzionale)
-
-Per proteggere la tua API key, puoi usare variabili d'ambiente. Crea un file `.env`:
-
-```env
-VITE_TMDB_API_KEY=tua-chiave-tmdb
-```
-
-Poi aggiorna `src/constants/api.js`:
+In questo progetto la chiave è letta tramite variabile d'ambiente in `frontend/src/shared/constants/api.js`:
 
 ```javascript
 export const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 ```
+
+Per configurarla in locale (senza Docker):
+
+1. Ottieni una chiave API gratuita da [TMDb](https://www.themoviedb.org/settings/api)
+2. Nella root del progetto crea/modifica il file `.env` (già ignorato da Git) con:
+
+```env
+VITE_TMDB_API_KEY=la_tua_chiave_tmdb
+```
+3. Riavvia il server di sviluppo (`npm run dev`) se era già in esecuzione.
+
+Quando usi Docker Compose, questo stesso valore viene passato automaticamente al container del frontend leggendo il file `.env` nella root.
 
 ## 🎨 Personalizzazione
 
