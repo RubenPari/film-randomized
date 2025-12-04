@@ -37,6 +37,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        VITE_TMDB_API_KEY: ${VITE_TMDB_API_KEY}
     container_name: film-frontend
     restart: always
     environment:

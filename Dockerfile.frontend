@@ -2,6 +2,10 @@
 
 FROM node:20-alpine
 
+# Build-time TMDb API key for Vite
+ARG VITE_TMDB_API_KEY
+ENV VITE_TMDB_API_KEY=${VITE_TMDB_API_KEY}
+
 # Set working directory
 WORKDIR /app
 
@@ -12,7 +16,7 @@ RUN npm ci
 # Copy frontend source
 COPY frontend ./frontend
 
-# Build Vite frontend
+# Build Vite frontend (uses VITE_TMDB_API_KEY)
 WORKDIR /app/frontend
 RUN npm run build
 
