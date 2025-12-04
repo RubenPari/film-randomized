@@ -9,6 +9,7 @@ Un'applicazione web moderna che ti aiuta a scoprire film e serie TV casuali in b
 ## ✨ Caratteristiche
 
 ### 🎯 Funzionalità Principali
+
 - **Generazione Casuale Intelligente**: Scopri film e serie TV casuali con un algoritmo che evita ripetizioni
 - **Filtri Avanzati**: Filtra per genere, valutazione (0-10), e anno di uscita
 - **Doppia Modalità**: Passa facilmente tra film e serie TV
@@ -18,35 +19,85 @@ Un'applicazione web moderna che ti aiuta a scoprire film e serie TV casuali in b
 ## 🚀 Quick Start
 
 ### Prerequisiti
+
 - **Node.js**: versione 18.0.0 o superiore
 - **npm**: versione 9.0.0 o superiore
 
 ### Installazione
 
 1. **Clona il repository**
+
 ```bash
 git clone <repository-url>
 cd film-randomized
 ```
 
 2. **Installa le dipendenze**
+
 ```bash
 npm install
 ```
 
 3. **Avvia il server di sviluppo**
+
 ```bash
 npm run dev
 ```
 
 4. **Apri il browser**
+
 ```
 http://localhost:5173
+```
+
+## 🐳 Docker Compose (Full Stack)
+
+### Prerequisiti
+
+- **Docker** installato e in esecuzione
+- **Docker Compose v2** (integrato in Docker Desktop recente)
+
+### Configurazione variabili d'ambiente
+
+Nella root del progetto crea un file `.env` (non viene committato) con almeno la chiave TMDb per il frontend:
+
+```env
+VITE_TMDB_API_KEY=la_tua_chiave_tmdb
+```
+
+> Nota: nello stack Docker Compose il backend usa automaticamente un database PostgreSQL in container (servizio `db`), **non** Neon. La stringa di connessione è già configurata nel `docker-compose.yml`.
+
+### Avvio dello stack completo
+
+Dalla root del progetto (`film-randomized/`):
+
+```bash
+docker compose up --build
+```
+
+Questo comando:
+
+- avvia PostgreSQL (`db`)
+- avvia il backend FastAPI (`backend`)
+- builda e avvia il frontend React/Vite (`frontend`)
+- avvia Nginx come reverse proxy (`proxy`)
+
+### URL di accesso
+
+- Applicazione web: `http://localhost`
+- API backend dirette: `http://localhost:8000`
+- Documentazione API (Swagger): `http://localhost:8000/docs`
+
+Per fermare tutto:
+
+```bash
+docker compose down
 ```
 
 ## 📋 Comandi Disponibili
 
 ### Sviluppo
+
 ```bash
 npm run dev          # Avvia il server di sviluppo (http://localhost:5173)
 npm run build        # Crea la build di produzione
@@ -54,6 +105,7 @@ npm run preview      # Anteprima della build di produzione
 ```
 
 ### Qualità del Codice
+
 ```bash
 npm run lint         # Esegue ESLint su tutti i file
 npm run format       # Formatta il codice con Prettier
@@ -65,6 +117,7 @@ npm run format:check # Verifica la formattazione senza modificare
 ### Stack Tecnologico
 
 #### Frontend
+
 - **React 19.0.0**: Framework UI con le ultime funzionalità
 - **Vite 6.2.0**: Build tool ultra-veloce con HMR
 - **TailwindCSS 3.4.17**: Framework CSS utility-first
@@ -72,6 +125,7 @@ npm run format:check # Verifica la formattazione senza modificare
 - **Prettier 3.5.3**: Formattazione automatica del codice
 
 #### APIs
+
 - **TMDb API**: Database di film e serie TV
 
 ### Struttura del Progetto
@@ -129,31 +183,37 @@ Filtri → useMediaGenerator → tmdbApi.discoverMedia()
 ### Pattern Architetturali
 
 #### 1. Custom Hook Pattern
+
 `useMediaGenerator` incapsula tutta la logica di generazione media, inclusi:
+
 - Gestione stato filtri
 - Chiamate API TMDb
 - Tracking media visualizzati
 - Algoritmo di randomizzazione
 
 #### 2. Service Layer
+
 I servizi API sono isolati nel modulo `tmdbApi.js` che gestisce tutte le interazioni con The Movie Database.
 
 #### 3. Component Composition
+
 Componenti piccoli e riutilizzabili per filtri e UI elements, garantendo manutenibilità e riusabilità del codice.
 
 ## 🔧 Configurazione
 
 ### TMDb API Key
+
 La chiave API di TMDb è configurata in `src/constants/api.js`. Per utilizzare la tua chiave:
 
 1. Ottieni una chiave API gratuita da [TMDb](https://www.themoviedb.org/settings/api)
 2. Modifica `src/constants/api.js`:
 
 ```javascript
-export const API_KEY = 'la-tua-chiave-api';
+export const API_KEY = "la-tua-chiave-api";
 ```
 
 ### Variabili d'Ambiente (Opzionale)
+
 Per proteggere la tua API key, puoi usare variabili d'ambiente. Crea un file `.env`:
 
 ```env
@@ -161,6 +221,7 @@ VITE_TMDB_API_KEY=tua-chiave-tmdb
 ```
 
 Poi aggiorna `src/constants/api.js`:
+
 ```javascript
 export const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 ```
@@ -170,17 +231,19 @@ export const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 ### Aggiungere Nuovi Filtri
 
 1. **Aggiungi stato in `useMediaGenerator.js`**:
+
 ```javascript
 const [nuovoFiltro, setNuovoFiltro] = useState(defaultValue);
 ```
 
 2. **Includi nel filters object**:
+
 ```javascript
 const filters = {
-    minRating,
-    maxRating,
-    nuovoFiltro,  // Aggiungi qui
-    // ...
+  minRating,
+  maxRating,
+  nuovoFiltro, // Aggiungi qui
+  // ...
 };
 ```
 
@@ -191,6 +254,7 @@ const filters = {
 5. **Aggiungi alla sezione filtri** in `App.jsx`
 
 ### Modificare Stili
+
 L'applicazione usa TailwindCSS. Per personalizzare:
 
 - **Colori/temi**: Modifica `tailwind.config.js`
@@ -202,6 +266,7 @@ L'applicazione usa TailwindCSS. Per personalizzare:
 ### Testare l'Applicazione Manualmente
 
 1. **Test Generazione Media**:
+
    - Clicca "Genera Contenuto Casuale"
    - Verifica che il media mostrato sia diverso ogni volta
    - Testa i filtri per genere, rating, anno
@@ -216,21 +281,25 @@ L'applicazione usa TailwindCSS. Per personalizzare:
 ### Problemi Comuni
 
 **Errore: "Nessun risultato trovato"**
+
 - I filtri sono troppo restrittivi
 - Prova ad ampliare l'intervallo di anni o rimuovere filtri genere
 - Verifica la connessione a Internet (necessaria per TMDb API)
 
 **Media senza descrizione italiana**
+
 - L'algoritmo filtra automaticamente questi casi
 - Clicca "Genera Contenuto Casuale" per ottenere un altro suggerimento
 
 **Errore API TMDb**
+
 - Verifica che la chiave API sia valida
 - Controlla di non aver superato il rate limit (40 richieste ogni 10 secondi)
 
 ## 📝 Note di Sviluppo
 
 ### Code Style
+
 - **Line width**: 100 caratteri (Prettier)
 - **Quotes**: Single quotes
 - **Indentazione**: 2 spazi
@@ -239,6 +308,7 @@ L'applicazione usa TailwindCSS. Per personalizzare:
 - **Imports**: Sempre con estensioni `.jsx` o `.js`
 
 ### Best Practices
+
 - Usa sempre i servizi API invece di fetch diretto
 - Valida descrizioni italiane con `hasValidDescription()`
 - Gestisci errori con try/catch e mostra messaggi utente-friendly
@@ -247,11 +317,13 @@ L'applicazione usa TailwindCSS. Per personalizzare:
 
 ## 🔐 Sicurezza
 
-⚠️ **Attenzione**: L'API key di TMDb è attualmente esposta nel codice sorgente. Per un'applicazione in produzione:
+⚠️ **Attenzione**: non esporre mai l'API key di TMDb nel codice sorgente committato.
 
-1. Usa variabili d'ambiente per la chiave API (non committare il file `.env`)
+Per un'applicazione in produzione:
+
+1. Usa sempre variabili d'ambiente per la chiave API (non committare il file `.env`)
 2. Considera di creare un backend proxy per le chiamate TMDb
-3. Non esporre mai chiavi API nel codice sorgente committato
+3. Mantieni le chiavi solo in sistemi di secret management o variabili d'ambiente del provider
 4. Implementa rate limiting lato client per evitare di superare i limiti TMDb
 
 ## 🚀 Deploy
@@ -273,6 +345,7 @@ I file ottimizzati saranno generati nella cartella `dist/`.
 5. Deploy!
 
 ### Note Importanti
+
 - Assicurati di configurare la chiave API TMDb come variabile d'ambiente
 - Verifica che le richieste all'API TMDb siano ottimizzate per evitare rate limiting
 
