@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { IMAGE_BASE_URL } from '../constants/api.js';
-import { fetchMediaVideos } from '../services/tmdbApi.js';
+import { IMAGE_BASE_URL } from '../../../shared/constants/api.js';
+import { fetchMediaVideos } from '../../../shared/services/tmdbApi.js';
 import SaveButtons from './SaveButtons.jsx';
 
 /**
@@ -27,29 +27,34 @@ function MediaCard({ media, mediaType }) {
   const hasLongOverview = Boolean(media.overview && media.overview.length > 280);
 
   // Fetch trailer when component mounts or media changes
-  useEffect(function() {
-    const loadTrailer = async function() {
-      try {
-        const videosData = await fetchMediaVideos(mediaType, media.id);
-        // Find the first YouTube trailer
-        const trailer = videosData.results?.find(function(video) {
-          return video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser');
-        });
-        if (trailer) {
-          setTrailerKey(trailer.key);
-        } else {
+  useEffect(
+    function () {
+      const loadTrailer = async function () {
+        try {
+          const videosData = await fetchMediaVideos(mediaType, media.id);
+          // Find the first YouTube trailer
+          const trailer = videosData.results?.find(function (video) {
+            return (
+              video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
+            );
+          });
+          if (trailer) {
+            setTrailerKey(trailer.key);
+          } else {
+            setTrailerKey(null);
+            setIsTrailerVisible(false);
+          }
+        } catch (error) {
+          console.error('Errore nel caricamento del trailer:', error);
           setTrailerKey(null);
           setIsTrailerVisible(false);
         }
-      } catch (error) {
-        console.error('Errore nel caricamento del trailer:', error);
-        setTrailerKey(null);
-        setIsTrailerVisible(false);
-      }
-    };
+      };
 
-    loadTrailer();
-  }, [media.id, mediaType]);
+      loadTrailer();
+    },
+    [media.id, mediaType]
+  );
 
   return (
     <div className="media-card">
@@ -94,9 +99,7 @@ function MediaCard({ media, mediaType }) {
 
           {/* Rating and genres display */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="rating-badge">
-              Voto: {media.vote_average.toFixed(1)}/10
-            </span>
+            <span className="rating-badge">Voto: {media.vote_average.toFixed(1)}/10</span>
             <span className="inline-block bg-gray-800 text-gray-200 text-sm font-medium px-3 py-1 rounded-full border border-gray-700">
               {media.vote_count.toLocaleString('it-IT')} voti
             </span>
@@ -130,8 +133,8 @@ function MediaCard({ media, mediaType }) {
             {hasLongOverview && (
               <button
                 type="button"
-                onClick={function() {
-                  setIsOverviewExpanded(function(prev) {
+                onClick={function () {
+                  setIsOverviewExpanded(function (prev) {
                     return !prev;
                   });
                 }}
@@ -149,7 +152,7 @@ function MediaCard({ media, mediaType }) {
               {!isTrailerVisible ? (
                 <button
                   type="button"
-                  onClick={function() {
+                  onClick={function () {
                     setIsTrailerVisible(true);
                   }}
                   className="btn-secondary bg-gray-800 text-gray-100 hover:bg-gray-700 border border-gray-700"
@@ -207,7 +210,7 @@ function MediaCard({ media, mediaType }) {
           </div>
 
           {/* Save buttons */}
-          <SaveButtons media={media} />
+          <SaveButtons media={media} mediaType={mediaType} />
         </div>
       </div>
     </div>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useMediaGenerator } from '../hooks/useMediaGenerator.js';
-import MediaTypeSelector from '../components/MediaTypeSelector.jsx';
-import RatingFilter from '../components/RatingFilter.jsx';
-import YearFilter from '../components/YearFilter.jsx';
-import VoteCountFilter from '../components/VoteCountFilter.jsx';
-import GenreFilter from '../components/GenreFilter.jsx';
-import MediaCard from '../components/MediaCard.jsx';
+import { useMediaGenerator } from '../features/media/hooks/useMediaGenerator.js';
+import MediaTypeSelector from '../features/media/components/filters/MediaTypeSelector.jsx';
+import RatingFilter from '../features/media/components/filters/RatingFilter.jsx';
+import YearFilter from '../features/media/components/filters/YearFilter.jsx';
+import VoteCountFilter from '../features/media/components/filters/VoteCountFilter.jsx';
+import GenreFilter from '../features/media/components/filters/GenreFilter.jsx';
+import MediaCard from '../features/media/components/MediaCard.jsx';
 
 /**
  * Home page component with media generator
@@ -52,13 +52,19 @@ function HomePage() {
               title="Vai alla Watchlist"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
               </svg>
               <span className="hidden md:inline">Watchlist</span>
             </Link>
           </div>
           <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
-            Scopri film e serie TV casuali in base ai tuoi gusti. Filtra per genere, anno e valutazione per trovare il tuo prossimo intrattenimento preferito.
+            Scopri film e serie TV casuali in base ai tuoi gusti. Filtra per genere, anno e
+            valutazione per trovare il tuo prossimo intrattenimento preferito.
           </p>
         </header>
 
@@ -69,8 +75,8 @@ function HomePage() {
             <div className="flex justify-end mb-4 lg:hidden">
               <button
                 type="button"
-                onClick={function() {
-                  setFiltersOpen(function(prev) {
+                onClick={function () {
+                  setFiltersOpen(function (prev) {
                     return !prev;
                   });
                 }}
@@ -107,9 +113,7 @@ function HomePage() {
             )}
 
             {/* Media card display */}
-            {randomMedia && !isLoading && (
-              <MediaCard media={randomMedia} mediaType={mediaType} />
-            )}
+            {randomMedia && !isLoading && <MediaCard media={randomMedia} mediaType={mediaType} />}
 
             {/* Viewed media counter and list */}
             {viewedMedia.length > 0 && (
@@ -118,7 +122,7 @@ function HomePage() {
                   Hai scoperto {viewedMedia.length} contenuti in questa sessione
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {viewedMedia.map(function(media, index) {
+                  {viewedMedia.map(function (media, index) {
                     const title = media.title || media.name;
                     const posterPath = media.poster_path;
                     return (
@@ -134,8 +138,18 @@ function HomePage() {
                           />
                         ) : (
                           <div className="w-full aspect-[2/3] bg-gray-700 rounded flex items-center justify-center">
-                            <svg className="w-12 h-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg
+                              className="w-12 h-12 text-gray-600"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
                             </svg>
                           </div>
                         )}
@@ -179,10 +193,7 @@ function HomePage() {
             </div>
 
             <div className="filter-section">
-              <VoteCountFilter
-                minVoteCount={minVoteCount}
-                setMinVoteCount={setMinVoteCount}
-              />
+              <VoteCountFilter minVoteCount={minVoteCount} setMinVoteCount={setMinVoteCount} />
             </div>
 
             <div className="filter-section">

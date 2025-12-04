@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getWatchlist, removeFromWatchlist } from '../services/watchlistApi.js';
-import { IMAGE_BASE_URL } from '../constants/api.js';
+import { getWatchlist, removeFromWatchlist } from '../../shared/services/watchlistApi.js';
+import { WatchlistItemCard } from './WatchlistPage.jsx';
 
 /**
  * Component to display and manage the user's watchlist
@@ -10,13 +10,16 @@ function Watchlist({ isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(function() {
-    if (isOpen) {
-      loadWatchlist();
-    }
-  }, [isOpen]);
+  useEffect(
+    function () {
+      if (isOpen) {
+        loadWatchlist();
+      }
+    },
+    [isOpen]
+  );
 
-  const loadWatchlist = async function() {
+  const loadWatchlist = async function () {
     setIsLoading(true);
     setError(null);
 
@@ -31,11 +34,11 @@ function Watchlist({ isOpen, onClose }) {
     }
   };
 
-  const handleRemove = async function(tmdbId) {
+  const handleRemove = async function (tmdbId) {
     try {
       await removeFromWatchlist(tmdbId);
-      setWatchlist(function(prev) {
-        return prev.filter(function(item) {
+      setWatchlist(function (prev) {
+        return prev.filter(function (item) {
           return item.tmdb_id !== tmdbId;
         });
       });
@@ -52,12 +55,14 @@ function Watchlist({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <h2 className="text-2xl font-bold text-white">La mia Watchlist</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -83,30 +88,14 @@ function Watchlist({ isOpen, onClose }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {watchlist.map(function(item) {
-                const genres = item.genres ? JSON.parse(item.genres) : [];
-                
+              {watchlist.map(function (item) {
                 return (
-                  <div
-                    key={item.id}
-                    className="bg-gray-800/50 rounded-lg border border-gray-700/50 overflow-hidden hover:border-gray-600 transition-colors"
-                  >
-                    <div className="flex">
-                      {/* Poster */}
-                      <div className="w-24 flex-shrink-0">
-                        {item.poster_path ? (
-                          <img
-                            src={`${IMAGE_BASE_URL}${item.poster_path}`}
-                            alt={item.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        )}
+                  <WatchlistItemCard key={item.id} item={item} onRemove={handleRemove} />
+                );
+              })}
+            </div>
+          )}
+
                       </div>
 
                       {/* Info */}
@@ -119,25 +108,39 @@ function Watchlist({ isOpen, onClose }) {
                                 {item.media_type ? 'Film' : 'Serie TV'}
                               </span>
                               {item.vote_average && (
-                                <span className="text-yellow-400">★ {item.vote_average.toFixed(1)}</span>
+                                <span className="text-yellow-400">
+                                  ★ {item.vote_average.toFixed(1)}
+                                </span>
                               )}
                             </div>
                           </div>
-                          
+
                           <button
-                            onClick={function() { handleRemove(item.tmdb_id); }}
+                            onClick={function () {
+                              handleRemove(item.tmdb_id);
+                            }}
                             className="text-red-400 hover:text-red-300 transition-colors"
                             title="Rimuovi dalla watchlist"
                           >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
                             </svg>
                           </button>
                         </div>
 
                         {genres.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {genres.slice(0, 3).map(function(genre) {
+                            {genres.slice(0, 3).map(function (genre) {
                               return (
                                 <span
                                   key={genre.id}

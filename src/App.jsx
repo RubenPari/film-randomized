@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage.jsx';
-import WatchlistPage from './pages/WatchlistPage.jsx';
+import WatchlistPage from './features/watchlist/WatchlistPage.jsx';
 
 /**
  * Main application component with routing

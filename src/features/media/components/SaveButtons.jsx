@@ -1,34 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { addToWatchlist, removeFromWatchlist, checkInWatchlist } from '../services/watchlistApi.js';
+import {
+  addToWatchlist,
+  removeFromWatchlist,
+  checkInWatchlist,
+} from '../../../shared/services/watchlistApi.js';
 
 /**
  * Component for saving media items to watchlist
  * @param {Object} props - Component props
  * @param {Object} props.media - Media object to save
+ * @param {boolean} props.mediaType - true for movie, false for TV show
  */
-function SaveButtons({ media }) {
+function SaveButtons({ media, mediaType }) {
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Determine media type based on available properties
-  const mediaType = media.title !== undefined; // true = movie, false = TV show
-
   // Check if media is already in watchlist on mount
-  useEffect(function() {
-    const checkStatus = async function() {
-      try {
-        const inWatchlist = await checkInWatchlist(media.id);
-        setIsInWatchlist(inWatchlist);
-      } catch (err) {
-        console.error('Errore nel controllo della watchlist:', err);
-      }
-    };
+  useEffect(
+    function () {
+      const checkStatus = async function () {
+        try {
+          const inWatchlist = await checkInWatchlist(media.id);
+          setIsInWatchlist(inWatchlist);
+        } catch (err) {
+          console.error('Errore nel controllo della watchlist:', err);
+        }
+      };
 
-    checkStatus();
-  }, [media.id]);
+      checkStatus();
+    },
+    [media.id]
+  );
 
-  const handleAddToWatchlist = async function() {
+  const handleAddToWatchlist = async function () {
     setIsLoading(true);
     setError(null);
 
@@ -37,13 +42,13 @@ function SaveButtons({ media }) {
       setIsInWatchlist(true);
     } catch (err) {
       setError(err.message);
-      console.error('Errore nell\'aggiunta alla watchlist:', err);
+      console.error("Errore nell'aggiunta alla watchlist:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRemoveFromWatchlist = async function() {
+  const handleRemoveFromWatchlist = async function () {
     setIsLoading(true);
     setError(null);
 
@@ -80,12 +85,7 @@ function SaveButtons({ media }) {
               </>
             ) : (
               <>
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -110,11 +110,7 @@ function SaveButtons({ media }) {
               </>
             ) : (
               <>
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
                 Nella Watchlist
