@@ -11,7 +11,10 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is not set")
+    raise RuntimeError(
+        "DATABASE_URL non è impostata. Consulta backend/README.md per la configurazione."
+    )
+
 
 # Create engine with NullPool for serverless compatibility (Neon)
 engine = create_engine(

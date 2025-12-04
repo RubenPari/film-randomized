@@ -44,3 +44,11 @@ class WatchlistItemResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class WatchlistCheckResponse(BaseModel):
+    """Schema for checking if an item is in the watchlist"""
+
+    in_watchlist: bool
+    item: Optional[WatchlistItemResponse] = None
+
