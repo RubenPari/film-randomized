@@ -1,25 +1,31 @@
+/**
+ * Rating filter component.
+ * Allows users to filter media by minimum and maximum rating.
+ */
 import React from 'react';
 
 /**
- * Component for filtering media by rating (min and max)
+ * Component for filtering media by rating range (min and max).
+ * 
  * @param {Object} props - Component props
- * @param {number} props.minRating - Minimum rating value
- * @param {number} props.maxRating - Maximum rating value
+ * @param {number} props.minRating - Minimum rating value (0-10)
+ * @param {number} props.maxRating - Maximum rating value (0-10)
  * @param {Function} props.setMinRating - Function to update minimum rating
  * @param {Function} props.setMaxRating - Function to update maximum rating
+ * @returns {JSX.Element} Rating filter component
  */
 function RatingFilter({ minRating, maxRating, setMinRating, setMaxRating }) {
   return (
     <div>
-      <h2 className="filter-title">Voto (1-10)</h2>
+      <h2 className="filter-title">Rating (1-10)</h2>
       <p className="text-sm text-gray-400 mb-3">
-        Seleziona l'intervallo di valutazione minimo e massimo.
+        Select the minimum and maximum rating range.
       </p>
 
       <div className="space-y-4">
         <div>
           <div className="flex justify-between text-sm text-gray-300 mb-1">
-            <span>Minimo</span>
+            <span>Minimum</span>
             <span className="font-semibold">{minRating.toFixed(1)}</span>
           </div>
           <div className="flex items-center">
@@ -39,7 +45,7 @@ function RatingFilter({ minRating, maxRating, setMinRating, setMaxRating }) {
 
         <div>
           <div className="flex justify-between text-sm text-gray-300 mb-1">
-            <span>Massimo</span>
+            <span>Maximum</span>
             <span className="font-semibold">{maxRating.toFixed(1)}</span>
           </div>
           <div className="flex items-center">

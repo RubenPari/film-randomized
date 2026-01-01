@@ -1,13 +1,27 @@
+/**
+ * Media card component.
+ * Displays detailed information about a media item including poster, title, description, and trailer.
+ */
 import React, { useState, useEffect } from 'react';
 import { IMAGE_BASE_URL } from '../../../shared/constants/api.js';
 import { fetchMediaVideos } from '../../../shared/services/tmdbApi.js';
 import SaveButtons from './SaveButtons.jsx';
 
 /**
- * Component for displaying detailed information about a media item
+ * Component for displaying detailed information about a media item.
+ * Shows poster, title, description, rating, genres, and optional trailer video.
+ * 
  * @param {Object} props - Component props
  * @param {Object} props.media - Media object with details to display
- * @param {boolean} props.mediaType - Type of media (true for movie, false for TV)
+ * @param {number} props.media.id - TMDB ID of the media
+ * @param {string} props.media.title - Title (for movies)
+ * @param {string} props.media.name - Title (for TV shows)
+ * @param {string} props.media.overview - Description/overview
+ * @param {string} props.media.poster_path - Poster image path
+ * @param {number} props.media.vote_average - Average vote rating
+ * @param {Array<Object>} props.media.genres - Array of genre objects
+ * @param {boolean} props.mediaType - Type of media (true for movie, false for TV show)
+ * @returns {JSX.Element} Media card component
  */
 function MediaCard({ media, mediaType }) {
   // Extract title based on media type (movie or TV show)
@@ -26,7 +40,9 @@ function MediaCard({ media, mediaType }) {
 
   const hasLongOverview = Boolean(media.overview && media.overview.length > 280);
 
-  // Fetch trailer when component mounts or media changes
+  /**
+   * Fetches trailer video when component mounts or media changes.
+   */
   useEffect(
     function () {
       const loadTrailer = async function () {
@@ -44,7 +60,7 @@ function MediaCard({ media, mediaType }) {
             setTrailerKey(null);
           }
         } catch (error) {
-          console.error('Errore nel caricamento del trailer:', error);
+          console.error('Error loading trailer:', error);
           setTrailerKey(null);
         }
       };
@@ -82,7 +98,7 @@ function MediaCard({ media, mediaType }) {
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="mt-2 text-gray-500">Nessuna immagine disponibile</span>
+                <span className="mt-2 text-gray-500">No image available</span>
               </div>
             </div>
           )}
@@ -97,20 +113,13 @@ function MediaCard({ media, mediaType }) {
 
           {/* Rating and genres display */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="rating-badge">Voto: {media.vote_average.toFixed(1)}/10</span>
-            <span className="inline-block bg-gray-800 text-gray-200 text-sm font-medium px-3 py-1 rounded-full border border-gray-700">
-              {media.vote_count.toLocaleString('it-IT')} voti
-            </span>
-
+            <span className="rating-badge">Rating: {media.vote_average.toFixed(1)}/10</span>
             {media.genres && media.genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
-                {media.genres.map(function (g) {
+              <div className="flex flex-wrap gap-1">
+                {media.genres.slice(0, 3).map(function (genre) {
                   return (
-                    <span
-                      key={g.id}
-                      className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm"
-                    >
-                      {g.name}
+                    <span key={genre.id} className="genre-badge">
+                      {genre.name}
                     </span>
                   );
                 })}
@@ -118,114 +127,61 @@ function MediaCard({ media, mediaType }) {
             )}
           </div>
 
-          {/* Overview/description */}
-          <div className="mb-6">
-            <p
-              className={
-                'text-gray-300 leading-relaxed ' +
-                (!isOverviewExpanded && hasLongOverview ? 'overview-clamped' : '')
-              }
-            >
-              {media.overview || 'Nessuna descrizione disponibile in italiano.'}
-            </p>
-            {hasLongOverview && (
-              <button
-                type="button"
-                onClick={function () {
-                  setIsOverviewExpanded(function (prev) {
-                    return !prev;
-                  });
-                }}
-                className="mt-2 text-sm text-blue-400 hover:text-blue-300"
-              >
-                {isOverviewExpanded ? 'Mostra meno' : 'Mostra di più'}
-              </button>
-            )}
-          </div>
-
-          {/* Trailer video player */}
-          {trailerKey && (
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xl font-semibold text-white">Trailer</h3>
+          {/* Description with expand/collapse */}
+          {media.overview && (
+            <div className="mb-4">
+              <p className="text-gray-300 leading-relaxed">
+                {isOverviewExpanded || !hasLongOverview
+                  ? media.overview
+                  : `${media.overview.substring(0, 280)}...`}
+              </p>
+              {hasLongOverview && (
                 <button
-                  type="button"
                   onClick={function () {
-                    setIsTrailerCollapsed(function (prev) {
+                    setIsOverviewExpanded(function (prev) {
                       return !prev;
                     });
                   }}
-                  className="text-sm text-gray-400 hover:text-gray-300 transition-colors flex items-center gap-1"
-                  title={isTrailerCollapsed ? 'Mostra trailer' : 'Nascondi trailer'}
+                  className="mt-2 text-blue-400 hover:text-blue-300 text-sm font-medium"
                 >
-                  {isTrailerCollapsed ? (
-                    <>
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                      Mostra trailer
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                      Nascondi trailer
-                    </>
-                  )}
+                  {isOverviewExpanded ? 'Show less' : 'Show more'}
                 </button>
-              </div>
+              )}
+            </div>
+          )}
+
+          {/* Trailer section */}
+          {trailerKey && (
+            <div className="mb-4">
+              <button
+                onClick={function () {
+                  setIsTrailerCollapsed(function (prev) {
+                    return !prev;
+                  });
+                }}
+                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium mb-2"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                </svg>
+                {isTrailerCollapsed ? 'Show Trailer' : 'Hide Trailer'}
+              </button>
               {!isTrailerCollapsed && (
-                <div className="relative w-full bg-gray-900 rounded-lg overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                <div className="aspect-video">
                   <iframe
-                    className="absolute top-0 left-0 w-full h-full"
-                    src={`https://www.youtube.com/embed/${trailerKey}?rel=0&modestbranding=1&playsinline=1`}
-                    title={`Trailer di ${title}`}
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${trailerKey}`}
+                    title="Trailer"
                     frameBorder="0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    className="rounded-lg"
                   ></iframe>
                 </div>
               )}
             </div>
           )}
-
-          {/* Additional details based on media type */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mediaType ? (
-              // Movie-specific details
-              <>
-                <div className="bg-gray-800/50 p-4 rounded-lg">
-                  <div className="text-gray-400 text-sm">Durata</div>
-                  <div className="text-lg font-semibold">
-                    {media.runtime ? `${media.runtime} min` : 'N/D'}
-                  </div>
-                </div>
-                <div className="bg-gray-800/50 p-4 rounded-lg">
-                  <div className="text-gray-400 text-sm">Produzione</div>
-                  <div className="text-lg font-semibold truncate">
-                    {media.production_companies?.length > 0
-                      ? media.production_companies[0].name
-                      : 'N/D'}
-                  </div>
-                </div>
-              </>
-            ) : (
-              // TV show-specific details
-              <>
-                <div className="bg-gray-800/50 p-4 rounded-lg">
-                  <div className="text-gray-400 text-sm">Stagioni</div>
-                  <div className="text-lg font-semibold">{media.number_of_seasons || 'N/D'}</div>
-                </div>
-                <div className="bg-gray-800/50 p-4 rounded-lg">
-                  <div className="text-gray-400 text-sm">Episodi</div>
-                  <div className="text-lg font-semibold">{media.number_of_episodes || 'N/D'}</div>
-                </div>
-              </>
-            )}
-          </div>
 
           {/* Save buttons */}
           <SaveButtons media={media} mediaType={mediaType} />

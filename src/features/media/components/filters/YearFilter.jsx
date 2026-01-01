@@ -1,25 +1,31 @@
+/**
+ * Year filter component.
+ * Allows users to filter media by release year range.
+ */
 import React from 'react';
 
 /**
- * Component for filtering media by release year range
+ * Component for filtering media by release year range.
+ * 
  * @param {Object} props - Component props
- * @param {number} props.releaseYearFrom - Start year for filtering
- * @param {number} props.releaseYearTo - End year for filtering
+ * @param {number} props.releaseYearFrom - Start year for filtering (1900-current year)
+ * @param {number} props.releaseYearTo - End year for filtering (1900-current year)
  * @param {Function} props.setReleaseYearFrom - Function to update start year
  * @param {Function} props.setReleaseYearTo - Function to update end year
+ * @returns {JSX.Element} Year filter component
  */
 function YearFilter({ releaseYearFrom, releaseYearTo, setReleaseYearFrom, setReleaseYearTo }) {
   const currentYear = new Date().getFullYear();
 
   return (
     <div>
-      <h2 className="filter-title">Anno di Uscita</h2>
+      <h2 className="filter-title">Release Year</h2>
       <p className="text-sm text-gray-400 mb-3">
-        Scegli un intervallo di anni per limitare la ricerca.
+        Choose a year range to limit the search.
       </p>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm mb-1 text-gray-300">Da</label>
+          <label className="block text-sm mb-1 text-gray-300">From</label>
           <input
             type="number"
             min="1900"
@@ -30,7 +36,7 @@ function YearFilter({ releaseYearFrom, releaseYearTo, setReleaseYearFrom, setRel
           />
         </div>
         <div>
-          <label className="block text-sm mb-1 text-gray-300">A</label>
+          <label className="block text-sm mb-1 text-gray-300">To</label>
           <input
             type="number"
             min="1900"
