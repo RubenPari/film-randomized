@@ -5,10 +5,11 @@
 
 /**
  * Base URL for API requests.
- * Uses relative path in production, localhost in development.
+ * Uses environment variable if set, otherwise relative path in production, localhost in development.
  * @type {string}
  */
-const API_BASE_URL = import.meta.env.PROD ? '/api' : 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? '/api' : 'http://localhost:8000/api');
 
 /**
  * Authentication API methods.

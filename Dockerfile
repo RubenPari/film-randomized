@@ -1,5 +1,6 @@
 # Frontend Dockerfile for Film Randomized React/Vite app
 # Multi-stage build for optimized image size
+# Optimized for Railway deployment
 
 # Build stage
 FROM node:20-alpine AS build
@@ -12,36 +13,30 @@ ENV VITE_TMDB_API_KEY=${VITE_TMDB_API_KEY}
 WORKDIR /app
 
 # Copy package files first for better layer caching
-COPY film-randomized/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
 # Copy frontend source code
-COPY film-randomized/ ./
+COPY . .
 
 # Build Vite frontend (uses VITE_TMDB_API_KEY)
 RUN npm run build
 
-# Production stage - use Vite preview server
-FROM node:20-alpine AS production
-
-# Install wget for healthcheck
-RUN apk add --no-cache wget
-
-WORKDIR /app
-
-# Copy package files and install all dependencies (Vite preview needs devDependencies)
-COPY film-randomized/package*.json ./
-RUN npm ci && \
-    npm cache clean --force
+# Production stage - use nginx for serving static files
+FROM nginx:alpine AS production
 
 # Copy built files from build stage
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose Vite preview port
-EXPOSE 4173
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Start Vite preview server
-CMD ["sh", "-c", "npm run preview -- --host 0.0.0.0 --port ${PORT:-4173}"]
+# Expose port (Railway will set PORT env variable)
+# Nginx listens on port 80 by default, but Railway may assign a different port
+EXPOSE 80
 
+# Start nginx
+# Railway sets PORT automatically, nginx will listen on 80
+CMD ["nginx", "-g", "daemon off;"]

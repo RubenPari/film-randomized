@@ -1,44 +1,12 @@
-# Node
 node_modules
-npm-debug.log
-yarn-error.log
 dist
-dist-ssr
-*.local
-
-# Python
-__pycache__
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-ENV/
-env/
-.venv/
-
-# Environment files
-.env
-.env.*
-!.env.example
-
-# Git
 .git
 .gitignore
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-
-# OS
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .DS_Store
-Thumbs.db
-
-# Build
-build/
-
-# Logs
-logs
 *.log
