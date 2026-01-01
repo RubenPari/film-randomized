@@ -1,9 +1,16 @@
+/**
+ * The Movie Database (TMDb) API service.
+ * Handles all API calls to TMDb for fetching media data.
+ */
+
 import {API_ENDPOINTS, API_KEY} from "../constants/api.js";
 
 /**
- * Fetch all available genres for movies and TV shows
- * Combines movie and TV genres, removing duplicates
- * @returns {Promise<Array>} Promise that resolves to an array of unique genres
+ * Fetches all available genres for movies and TV shows.
+ * Combines movie and TV genres, removing duplicates.
+ * 
+ * @returns {Promise<Array<Object>>} Promise that resolves to an array of unique genres
+ * @throws {Error} If the API request fails
  */
 export async function fetchGenres() {
     try {
@@ -31,15 +38,23 @@ export async function fetchGenres() {
             });
         });
     } catch (error) {
-        throw new Error("Impossibile recuperare i generi: " + error.message);
+        throw new Error("Unable to retrieve genres: " + error.message);
     }
 }
 
 /**
- * Discover media based on filters
+ * Discovers media based on filters.
+ * 
  * @param {boolean} mediaType - true for movies, false for TV shows
  * @param {Object} filters - Object containing filter parameters
+ * @param {number} filters.minRating - Minimum vote average
+ * @param {number} filters.maxRating - Maximum vote average
+ * @param {Array<number>} filters.selectedGenres - Array of genre IDs
+ * @param {number} filters.releaseYearFrom - Start year for release date
+ * @param {number} filters.releaseYearTo - End year for release date
+ * @param {number} filters.minVoteCount - Minimum number of votes
  * @returns {Promise<Object>} Promise that resolves to an object with discovery URL and total pages
+ * @throws {Error} If no results are found with the given filters
  */
 export async function discoverMedia(mediaType, filters) {
     const {minRating, maxRating, selectedGenres, releaseYearFrom, releaseYearTo, minVoteCount} = filters;
@@ -59,7 +74,7 @@ export async function discoverMedia(mediaType, filters) {
 
     // Throw error if no results found
     if (data.results.length === 0) {
-        throw new Error('Nessun risultato trovato con questi filtri');
+        throw new Error('No results found with these filters');
     }
 
     // Return URL and limited total pages (max 500 to avoid excessive API calls)
@@ -67,7 +82,8 @@ export async function discoverMedia(mediaType, filters) {
 }
 
 /**
- * Fetch a specific page of media from the discovery API
+ * Fetches a specific page of media from the discovery API.
+ * 
  * @param {string} discoverUrl - Base discovery URL
  * @param {number} page - Page number to fetch
  * @returns {Promise<Object>} Promise that resolves to the page data
@@ -78,7 +94,8 @@ export async function fetchMediaPage(discoverUrl, page) {
 }
 
 /**
- * Fetch detailed information about a specific media item
+ * Fetches detailed information about a specific media item.
+ * 
  * @param {boolean} mediaType - true for movies, false for TV shows
  * @param {number} mediaId - ID of the media item
  * @returns {Promise<Object>} Promise that resolves to detailed media information
@@ -90,7 +107,9 @@ export async function fetchMediaDetails(mediaType, mediaId) {
 }
 
 /**
- * Fetch videos/trailers for a specific media item
+ * Fetches videos/trailers for a specific media item.
+ * Tries Italian first, falls back to English if no Italian videos are found.
+ * 
  * @param {boolean} mediaType - true for movies, false for TV shows
  * @param {number} mediaId - ID of the media item
  * @returns {Promise<Object>} Promise that resolves to videos data
