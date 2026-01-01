@@ -1,3 +1,7 @@
+/**
+ * Custom hook for managing media generation state and logic.
+ * Handles API calls, filtering, and user interactions for random media generation.
+ */
 import { useState, useEffect } from 'react';
 import {
   fetchGenres,
@@ -13,14 +17,40 @@ import {
 } from '../../../shared/utils/mediaUtils.js';
 
 /**
- * Custom hook that manages the state and logic for generating random media
- * Handles API calls, filtering, and user interactions
+ * Maximum number of attempts to generate valid media before giving up.
+ * @type {number}
  */
 const MAX_GENERATION_ATTEMPTS = 5;
 
+/**
+ * Custom hook that manages the state and logic for generating random media.
+ * Handles API calls, filtering, and user interactions.
+ * 
+ * @returns {Object} Object containing state values and action functions
+ * @returns {boolean} returns.mediaType - Current media type (true = movie, false = TV show)
+ * @returns {number} returns.minRating - Minimum rating filter
+ * @returns {number} returns.maxRating - Maximum rating filter
+ * @returns {number} returns.releaseYearFrom - Start year filter
+ * @returns {number} returns.releaseYearTo - End year filter
+ * @returns {number} returns.minVoteCount - Minimum vote count filter
+ * @returns {Array<number>} returns.selectedGenres - Array of selected genre IDs
+ * @returns {Array<Object>} returns.genres - Available genres list
+ * @returns {Object|null} returns.randomMedia - Currently generated random media
+ * @returns {boolean} returns.isLoading - Loading state
+ * @returns {string|null} returns.error - Error message if any
+ * @returns {Array<Object>} returns.viewedMedia - Array of previously viewed media
+ * @returns {Function} returns.setMediaType - Function to set media type
+ * @returns {Function} returns.setMinRating - Function to set minimum rating
+ * @returns {Function} returns.setMaxRating - Function to set maximum rating
+ * @returns {Function} returns.setReleaseYearFrom - Function to set start year
+ * @returns {Function} returns.setReleaseYearTo - Function to set end year
+ * @returns {Function} returns.setMinVoteCount - Function to set minimum vote count
+ * @returns {Function} returns.generateRandomMedia - Function to generate random media
+ * @returns {Function} returns.handleGenreToggle - Function to toggle genre selection
+ */
 export function useMediaGenerator() {
   // State declarations
-  const [mediaType, setMediaType] = useState(true); // true = film, false = serie TV
+  const [mediaType, setMediaType] = useState(true); // true = movie, false = TV show
   const [minRating, setMinRating] = useState(0);
   const [maxRating, setMaxRating] = useState(10);
   const [releaseYearFrom, setReleaseYearFrom] = useState(1900);
@@ -34,7 +64,7 @@ export function useMediaGenerator() {
   const [viewedMedia, setViewedMedia] = useState([]);
 
   /**
-   * Load genres when the component mounts
+   * Load genres when the component mounts.
    */
   useEffect(function () {
     const loadGenres = async function () {
@@ -42,7 +72,7 @@ export function useMediaGenerator() {
         const genresData = await fetchGenres();
         setGenres(genresData);
       } catch (err) {
-        setError('Errore nel caricamento dei generi');
+        setError('Error loading genres');
         console.error(err);
       }
     };
@@ -51,8 +81,10 @@ export function useMediaGenerator() {
   }, []);
 
   /**
-   * Generate a random media item based on current filters
-   * Makes API calls to TMDB and filters results
+   * Generates a random media item based on current filters.
+   * Makes API calls to TMDB and filters results.
+   * 
+   * @returns {Promise<void>} Promise that resolves when media is generated
    */
   const generateRandomMedia = async function () {
     setIsLoading(true);
@@ -72,9 +104,15 @@ export function useMediaGenerator() {
       // Get discovery URL and total pages from TMDB API
       const { discoverUrl, totalPages } = await discoverMedia(mediaType, filters);
 
+      /**
+       * Recursive function to attempt media generation.
+       * 
+       * @param {number} attempt - Current attempt number
+       * @returns {Promise<void>} Promise that resolves when valid media is found
+       */
       const attemptGenerate = async function (attempt) {
         if (attempt >= MAX_GENERATION_ATTEMPTS) {
-          throw new Error('Nessun contenuto trovato. Prova a modificare i filtri.');
+          throw new Error('No content found. Try modifying the filters.');
         }
 
         // Select a random page to get varied results
@@ -114,7 +152,7 @@ export function useMediaGenerator() {
 
       await attemptGenerate(0);
     } catch (err) {
-      setError(err.message || 'Si è verificato un errore. Riprova più tardi.');
+      setError(err.message || 'An error occurred. Please try again later.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -122,7 +160,8 @@ export function useMediaGenerator() {
   };
 
   /**
-   * Toggle genre selection (add or remove from selected genres)
+   * Toggles genre selection (add or remove from selected genres).
+   * 
    * @param {number} genreId - ID of the genre to toggle
    */
   const handleGenreToggle = function (genreId) {

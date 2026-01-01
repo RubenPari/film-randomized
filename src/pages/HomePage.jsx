@@ -1,3 +1,7 @@
+/**
+ * Home page component with media generator.
+ * Main page where users can generate random media based on filters.
+ */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext.jsx';
@@ -10,13 +14,19 @@ import GenreFilter from '../features/media/components/filters/GenreFilter.jsx';
 import MediaCard from '../features/media/components/MediaCard.jsx';
 
 /**
- * Home page component with media generator
+ * Home page component.
+ * Displays media generator with filters and generated media results.
+ * 
+ * @returns {JSX.Element} Home page with media generator
  */
 function HomePage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  /**
+   * Handles user logout and redirects to login page.
+   */
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -58,7 +68,7 @@ function HomePage() {
             <Link
               to="/watchlist"
               className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm"
-              title="Vai alla Watchlist"
+              title="Go to Watchlist"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -91,11 +101,11 @@ function HomePage() {
         {/* Header section with title and description */}
         <header className="text-center mb-10 py-8">
           <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
-            Generatore Random di {mediaType ? 'Film' : 'Serie TV'}
+            Random {mediaType ? 'Movie' : 'TV Show'} Generator
           </h1>
           <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
-            Scopri film e serie TV casuali in base ai tuoi gusti. Filtra per genere, anno e
-            valutazione per trovare il tuo prossimo intrattenimento preferito.
+            Discover random movies and TV shows based on your preferences. Filter by genre, year, and
+            rating to find your next favorite entertainment.
           </p>
         </header>
 
@@ -113,7 +123,7 @@ function HomePage() {
                 }}
                 className="inline-flex items-center px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
               >
-                {filtersOpen ? 'Nascondi filtri' : 'Mostra filtri'}
+                {filtersOpen ? 'Hide filters' : 'Show filters'}
               </button>
             </div>
 
@@ -127,10 +137,10 @@ function HomePage() {
                 {isLoading ? (
                   <>
                     <div className="loading-spinner mr-2"></div>
-                    Caricamento...
+                    Loading...
                   </>
                 ) : (
-                  'Genera Contenuto Casuale'
+                  'Generate Random Content'
                 )}
               </button>
             </div>
@@ -138,7 +148,7 @@ function HomePage() {
             {/* Error message display */}
             {error && (
               <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-xl border border-red-700/50 backdrop-blur-sm">
-                <div className="font-bold mb-1">Errore</div>
+                <div className="font-bold mb-1">Error</div>
                 <div>{error}</div>
               </div>
             )}
@@ -150,7 +160,7 @@ function HomePage() {
             {viewedMedia.length > 0 && (
               <div className="mt-6 p-6 bg-gray-800/30 rounded-xl border border-gray-700/50 backdrop-blur-sm">
                 <div className="text-center text-gray-400 mb-4">
-                  Hai scoperto {viewedMedia.length} contenuti in questa sessione
+                  You've discovered {viewedMedia.length} content items in this session
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {viewedMedia.map(function (media, index) {
@@ -241,7 +251,7 @@ function HomePage() {
       {/* Mobile sticky generate button */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 px-4 py-3 flex items-center justify-between lg:hidden">
         <span className="text-sm text-gray-300">
-          Genera un nuovo {mediaType ? 'film' : 'contenuto TV'}
+          Generate a new {mediaType ? 'movie' : 'TV content'}
         </span>
         <button
           type="button"
@@ -252,10 +262,10 @@ function HomePage() {
           {isLoading ? (
             <>
               <div className="loading-spinner mr-2"></div>
-              Caricamento...
+              Loading...
             </>
           ) : (
-            'Genera'
+            'Generate'
           )}
         </button>
       </div>
