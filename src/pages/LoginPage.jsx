@@ -1,9 +1,16 @@
+/**
+ * Login page component.
+ * Handles user authentication with username and password.
+ */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext.jsx';
 
 /**
- * Login page component
+ * Login page component.
+ * Provides a form for user authentication.
+ * 
+ * @returns {JSX.Element} Login page with authentication form
  */
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -13,6 +20,11 @@ function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  /**
+   * Handles form submission for login.
+   * 
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -22,7 +34,7 @@ function LoginPage() {
       await login(username, password);
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Errore durante il login');
+      setError(err.message || 'Error during login');
     } finally {
       setLoading(false);
     }
@@ -34,9 +46,9 @@ function LoginPage() {
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 shadow-2xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
-              Accedi
+              Login
             </h1>
-            <p className="text-gray-400">Accedi al tuo account per continuare</p>
+            <p className="text-gray-400">Sign in to your account to continue</p>
           </div>
 
           {error && (
@@ -57,7 +69,7 @@ function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Il tuo username"
+                placeholder="Your username"
                 disabled={loading}
               />
             </div>
@@ -73,7 +85,7 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="La tua password"
+                placeholder="Your password"
                 disabled={loading}
               />
             </div>
@@ -83,15 +95,15 @@ function LoginPage() {
               disabled={loading}
               className="w-full btn-primary py-3 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Accesso in corso...' : 'Accedi'}
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Non hai un account?{' '}
+              Don't have an account?{' '}
               <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">
-                Registrati
+                Sign up
               </Link>
             </p>
           </div>
@@ -102,4 +114,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-
