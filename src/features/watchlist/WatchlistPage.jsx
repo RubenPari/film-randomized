@@ -1,9 +1,22 @@
+/**
+ * Watchlist page component.
+ * Displays and manages the user's watchlist with filtering capabilities.
+ */
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../shared/context/AuthContext.jsx';
 import { getWatchlist, removeFromWatchlist } from '../../shared/services/watchlistApi.js';
 import { IMAGE_BASE_URL } from '../../shared/constants/api.js';
 
+/**
+ * Watchlist item card component.
+ * Displays a single watchlist item with poster, title, and remove button.
+ * 
+ * @param {Object} props - Component props
+ * @param {Object} props.item - Watchlist item data
+ * @param {Function} props.onRemove - Callback function when item is removed
+ * @returns {JSX.Element} Watchlist item card
+ */
 export function WatchlistItemCard({ item, onRemove }) {
   const genres = item.genres ? JSON.parse(item.genres) : [];
 
@@ -16,7 +29,7 @@ export function WatchlistItemCard({ item, onRemove }) {
           target="_blank"
           rel="noopener noreferrer"
           className="block relative aspect-[2/3] bg-gray-800 hover:opacity-90 transition-opacity"
-          title={`Visualizza ${item.title} su TMDB`}
+          title={`View ${item.title} on TMDB`}
         >
           {item.poster_path ? (
             <img
@@ -44,7 +57,7 @@ export function WatchlistItemCard({ item, onRemove }) {
 
           {/* Media type badge */}
           <div className="absolute top-2 right-2 px-2 py-1 bg-gray-900/90 backdrop-blur-sm rounded text-xs font-medium text-white">
-            {item.media_type ? 'Film' : 'TV'}
+            {item.media_type ? 'Movie' : 'TV'}
           </div>
         </a>
 
@@ -54,7 +67,7 @@ export function WatchlistItemCard({ item, onRemove }) {
             onRemove(item.tmdb_id);
           }}
           className="absolute top-2 left-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors opacity-0 group-hover:opacity-100 z-10"
-          title="Rimuovi dalla watchlist"
+          title="Remove from watchlist"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -105,7 +118,10 @@ export function WatchlistItemCard({ item, onRemove }) {
 }
 
 /**
- * Dedicated watchlist page component
+ * Dedicated watchlist page component.
+ * Displays user's watchlist with filtering by media type.
+ * 
+ * @returns {JSX.Element} Watchlist page
  */
 function WatchlistPage() {
   const { token } = useAuth();
@@ -114,12 +130,18 @@ function WatchlistPage() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all'); // 'all', 'movies', 'tv'
 
+  /**
+   * Loads watchlist when component mounts or token changes.
+   */
   useEffect(function () {
     if (token) {
       loadWatchlist();
     }
   }, [token]);
 
+  /**
+   * Loads watchlist from API.
+   */
   const loadWatchlist = async function () {
     if (!token) return;
     
@@ -130,13 +152,18 @@ function WatchlistPage() {
       const data = await getWatchlist(token);
       setWatchlist(data);
     } catch (err) {
-      setError('Errore nel caricamento della watchlist');
+      setError('Error loading watchlist');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  /**
+   * Handles removal of item from watchlist.
+   * 
+   * @param {number} tmdbId - TMDB ID of item to remove
+   */
   const handleRemove = async function (tmdbId) {
     if (!token) return;
     
@@ -148,10 +175,13 @@ function WatchlistPage() {
         });
       });
     } catch (err) {
-      console.error('Errore nella rimozione:', err);
+      console.error('Error removing item:', err);
     }
   };
 
+  /**
+   * Filters watchlist based on selected filter.
+   */
   const filteredWatchlist = watchlist.filter(function (item) {
     if (filter === 'movies') return item.media_type === true;
     if (filter === 'tv') return item.media_type === false;
@@ -168,7 +198,7 @@ function WatchlistPage() {
               <Link
                 to="/"
                 className="text-gray-400 hover:text-white transition-colors"
-                title="Torna alla home"
+                title="Back to home"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -179,7 +209,7 @@ function WatchlistPage() {
                   />
                 </svg>
               </Link>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">La mia Watchlist</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">My Watchlist</h1>
             </div>
 
             {/* Filter tabs */}
@@ -194,7 +224,7 @@ function WatchlistPage() {
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                Tutti
+                All
               </button>
               <button
                 onClick={function () {
@@ -206,7 +236,7 @@ function WatchlistPage() {
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                Film
+                Movies
               </button>
               <button
                 onClick={function () {
@@ -218,7 +248,7 @@ function WatchlistPage() {
                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                Serie TV
+                TV Shows
               </button>
             </div>
           </div>
@@ -230,11 +260,11 @@ function WatchlistPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="loading-spinner mr-3"></div>
-            <span className="text-gray-400 text-lg">Caricamento...</span>
+            <span className="text-gray-400 text-lg">Loading...</span>
           </div>
         ) : error ? (
           <div className="p-6 bg-red-900/50 text-red-200 rounded-xl border border-red-700/50 max-w-2xl mx-auto">
-            <div className="font-bold mb-2 text-xl">Errore</div>
+            <div className="font-bold mb-2 text-xl">Error</div>
             <div>{error}</div>
           </div>
         ) : filteredWatchlist.length === 0 ? (
@@ -254,10 +284,10 @@ function WatchlistPage() {
             </svg>
             <p className="text-gray-400 text-2xl font-semibold mb-2">
               {filter === 'all'
-                ? 'La tua watchlist è vuota'
-                : `Nessun ${filter === 'movies' ? 'film' : 'serie TV'} nella watchlist`}
+                ? 'Your watchlist is empty'
+                : `No ${filter === 'movies' ? 'movies' : 'TV shows'} in watchlist`}
             </p>
-            <p className="text-gray-500 mb-6">Torna alla home e aggiungi contenuti da guardare!</p>
+            <p className="text-gray-500 mb-6">Go back home and add content to watch!</p>
             <Link
               to="/"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
@@ -270,7 +300,7 @@ function WatchlistPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Scopri nuovi contenuti
+              Discover new content
             </Link>
           </div>
         ) : (
@@ -279,7 +309,7 @@ function WatchlistPage() {
             <div className="mb-6 flex items-center justify-between">
               <p className="text-gray-400">
                 {filteredWatchlist.length}{' '}
-                {filteredWatchlist.length === 1 ? 'contenuto' : 'contenuti'}
+                {filteredWatchlist.length === 1 ? 'item' : 'items'}
               </p>
             </div>
 

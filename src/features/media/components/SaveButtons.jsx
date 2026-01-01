@@ -1,3 +1,7 @@
+/**
+ * Component for saving media items to watchlist.
+ * Handles adding and removing items from the user's watchlist.
+ */
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../shared/context/AuthContext.jsx';
 import {
@@ -7,10 +11,13 @@ import {
 } from '../../../shared/services/watchlistApi.js';
 
 /**
- * Component for saving media items to watchlist
+ * Save buttons component for watchlist management.
+ * 
  * @param {Object} props - Component props
  * @param {Object} props.media - Media object to save
+ * @param {number} props.media.id - TMDB ID of the media
  * @param {boolean} props.mediaType - true for movie, false for TV show
+ * @returns {JSX.Element} Save buttons component
  */
 function SaveButtons({ media, mediaType }) {
   const { token } = useAuth();
@@ -18,7 +25,9 @@ function SaveButtons({ media, mediaType }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Check if media is already in watchlist on mount
+  /**
+   * Checks if media is already in watchlist on mount.
+   */
   useEffect(
     function () {
       if (!token) return;
@@ -28,7 +37,7 @@ function SaveButtons({ media, mediaType }) {
           const inWatchlist = await checkInWatchlist(media.id, token);
           setIsInWatchlist(inWatchlist);
         } catch (err) {
-          console.error('Errore nel controllo della watchlist:', err);
+          console.error('Error checking watchlist status:', err);
         }
       };
 
@@ -37,6 +46,9 @@ function SaveButtons({ media, mediaType }) {
     [media.id, token]
   );
 
+  /**
+   * Handles adding media to watchlist.
+   */
   const handleAddToWatchlist = async function () {
     if (!token) return;
     
@@ -48,12 +60,15 @@ function SaveButtons({ media, mediaType }) {
       setIsInWatchlist(true);
     } catch (err) {
       setError(err.message);
-      console.error("Errore nell'aggiunta alla watchlist:", err);
+      console.error('Error adding to watchlist:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  /**
+   * Handles removing media from watchlist.
+   */
   const handleRemoveFromWatchlist = async function () {
     if (!token) return;
     
@@ -65,7 +80,7 @@ function SaveButtons({ media, mediaType }) {
       setIsInWatchlist(false);
     } catch (err) {
       setError(err.message);
-      console.error('Errore nella rimozione dalla watchlist:', err);
+      console.error('Error removing from watchlist:', err);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +104,7 @@ function SaveButtons({ media, mediaType }) {
             {isLoading ? (
               <>
                 <div className="loading-spinner"></div>
-                Aggiunta...
+                Adding...
               </>
             ) : (
               <>
@@ -101,7 +116,7 @@ function SaveButtons({ media, mediaType }) {
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                Aggiungi alla Watchlist
+                Add to Watchlist
               </>
             )}
           </button>
@@ -114,14 +129,14 @@ function SaveButtons({ media, mediaType }) {
             {isLoading ? (
               <>
                 <div className="loading-spinner"></div>
-                Rimozione...
+                Removing...
               </>
             ) : (
               <>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
-                Nella Watchlist
+                In Watchlist
               </>
             )}
           </button>
