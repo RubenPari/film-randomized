@@ -1,13 +1,33 @@
+/**
+ * Authentication context and provider.
+ * Manages user authentication state, token storage, and authentication methods.
+ */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authApi } from '../services/authApi.js';
 
+/**
+ * Authentication context.
+ * @type {React.Context<Object|null>}
+ */
 const AuthContext = createContext(null);
 
+/**
+ * Authentication provider component.
+ * Provides authentication state and methods to child components.
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components
+ * @returns {JSX.Element} AuthContext provider
+ */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Effect hook that checks if user is logged in on mount.
+   * Validates stored token and loads user data if valid.
+   */
   useEffect(() => {
     // Check if user is logged in on mount
     if (token) {
@@ -29,6 +49,14 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
+  /**
+   * Logs in a user with username and password.
+   * 
+   * @param {string} username - The username
+   * @param {string} password - The password
+   * @returns {Promise<Object>} Promise that resolves to auth response
+   * @throws {Error} If login fails
+   */
   const login = async (username, password) => {
     try {
       const response = await authApi.login(username, password);
@@ -41,6 +69,15 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Registers a new user.
+   * 
+   * @param {string} username - The username
+   * @param {string} email - The email address
+   * @param {string} password - The password
+   * @returns {Promise<Object>} Promise that resolves to auth response
+   * @throws {Error} If registration fails
+   */
   const register = async (username, email, password) => {
     try {
       const response = await authApi.register(username, email, password);
@@ -53,6 +90,10 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Logs out the current user.
+   * Clears token and user data from state and localStorage.
+   */
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -72,6 +113,12 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/**
+ * Custom hook to access authentication context.
+ * 
+ * @returns {Object} Authentication context value
+ * @throws {Error} If used outside AuthProvider
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -79,4 +126,3 @@ export function useAuth() {
   }
   return context;
 }
-

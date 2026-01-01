@@ -1,3 +1,7 @@
+/**
+ * Application entry point.
+ * Initializes React application with React Router and renders the App component.
+ */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';

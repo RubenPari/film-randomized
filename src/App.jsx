@@ -1,3 +1,7 @@
+/**
+ * Main application component with routing.
+ * Sets up React Router routes and provides authentication context.
+ */
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
@@ -9,7 +13,10 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import WatchlistPage from './features/watchlist/WatchlistPage.jsx';
 
 /**
- * Main application component with routing
+ * Root application component.
+ * Configures routes and wraps app in authentication provider.
+ * 
+ * @returns {JSX.Element} Application with routing
  */
 function App() {
   return (
