@@ -1,28 +1,9 @@
+import { apiClient, ApiError } from './apiClient';
+
 /**
  * Watchlist API service.
- * Handles all watchlist-related API calls to the backend.
+ * Handles all watchlist-related API calls to the backend using the centralized client.
  */
-
-/**
- * Base URL for API requests.
- * Uses environment variable if set, otherwise relative path in production, localhost in development.
- * @type {string}
- */
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? '/api' : 'http://localhost:8000/api');
-
-/**
- * Gets authorization headers with token.
- * 
- * @param {string} token - JWT authentication token
- * @returns {Object} Headers object with Content-Type and Authorization
- */
-function getAuthHeaders(token) {
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  };
-}
 
 /**
  * Adds a media item to the watchlist.
@@ -34,7 +15,7 @@ function getAuthHeaders(token) {
  * @param {boolean} mediaType - true for movie, false for TV show
  * @param {string} token - JWT token for authentication
  * @returns {Promise<Object>} Promise that resolves to the created watchlist item
- * @throws {Error} If the request fails
+ * @throws {import('./apiClient').ApiError} If the request fails
  */
 export async function addToWatchlist(media, mediaType, token) {
   const payload = {
@@ -54,18 +35,7 @@ export async function addToWatchlist(media, mediaType, token) {
     number_of_episodes: media.number_of_episodes || null
   };
 
-  const response = await fetch(`${API_BASE_URL}/watchlist`, {
-    method: 'POST',
-    headers: getAuthHeaders(token),
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || error.detail || 'Error adding to watchlist');
-  }
-
-  return await response.json();
+  return apiClient.post('/watchlist', payload, token);
 }
 
 /**
@@ -73,18 +43,10 @@ export async function addToWatchlist(media, mediaType, token) {
  * 
  * @param {string} token - JWT token for authentication
  * @returns {Promise<Array<Object>>} Promise that resolves to array of watchlist items
- * @throws {Error} If the request fails
+ * @throws {import('./apiClient').ApiError} If the request fails
  */
 export async function getWatchlist(token) {
-  const response = await fetch(`${API_BASE_URL}/watchlist`, {
-    headers: getAuthHeaders(token),
-  });
-
-  if (!response.ok) {
-    throw new Error('Error retrieving watchlist');
-  }
-
-  return await response.json();
+  return apiClient.get('/watchlist', token);
 }
 
 /**
@@ -95,16 +57,15 @@ export async function getWatchlist(token) {
  * @returns {Promise<boolean>} Promise that resolves to true if item is in watchlist
  */
 export async function checkInWatchlist(tmdbId, token) {
-  const response = await fetch(`${API_BASE_URL}/watchlist/${tmdbId}`, {
-    headers: getAuthHeaders(token),
-  });
-
-  if (!response.ok) {
-    return false;
+  try {
+    const data = await apiClient.get(`/watchlist/${tmdbId}`, token);
+    return data && data.tmdb_id === tmdbId; // Assuming backend returns the item if found
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return false;
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  return data.in_watchlist;
 }
 
 /**
@@ -113,16 +74,8 @@ export async function checkInWatchlist(tmdbId, token) {
  * @param {number} tmdbId - TMDB ID of the media to remove
  * @param {string} token - JWT token for authentication
  * @returns {Promise<void>} Promise that resolves when item is removed
- * @throws {Error} If the request fails
+ * @throws {import('./apiClient').ApiError} If the request fails
  */
 export async function removeFromWatchlist(tmdbId, token) {
-  const response = await fetch(`${API_BASE_URL}/watchlist/${tmdbId}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(token),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || error.detail || 'Error removing from watchlist');
-  }
+  return apiClient.delete(`/watchlist/${tmdbId}`, token);
 }
