@@ -89,8 +89,11 @@ function SaveButtons({ media, mediaType }) {
   return (
     <div className="mt-6">
       {error && (
-        <div className="mb-3 p-3 bg-red-900/50 text-red-200 rounded-lg text-sm border border-red-700/50">
-          {error}
+        <div className="mb-3 p-3 bg-red-900/50 text-red-200 rounded-lg text-sm border border-red-700/50 flex items-start gap-2">
+          <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{error}</span>
         </div>
       )}
 
@@ -99,7 +102,7 @@ function SaveButtons({ media, mediaType }) {
           <button
             onClick={handleAddToWatchlist}
             disabled={isLoading}
-            className="btn-primary flex items-center justify-center gap-2 flex-1"
+            className="btn-primary flex items-center justify-center gap-2 flex-1 font-bold hover:scale-105 transition-all duration-200 shadow-lg shadow-cyan-500/30"
           >
             {isLoading ? (
               <>
@@ -124,7 +127,7 @@ function SaveButtons({ media, mediaType }) {
           <button
             onClick={handleRemoveFromWatchlist}
             disabled={isLoading}
-            className="btn-secondary flex items-center justify-center gap-2 flex-1 bg-green-600 hover:bg-green-700 border-green-500 text-white"
+            className="btn-secondary flex items-center justify-center gap-2 flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 border-green-500 text-white font-bold hover:scale-105 transition-all duration-200 shadow-lg shadow-green-500/30"
           >
             {isLoading ? (
               <>
@@ -133,7 +136,7 @@ function SaveButtons({ media, mediaType }) {
               </>
             ) : (
               <>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
                 In Watchlist

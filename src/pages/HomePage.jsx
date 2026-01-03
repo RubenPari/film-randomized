@@ -60,14 +60,19 @@ function HomePage() {
       <div className="max-w-6xl mx-auto">
         {/* User header */}
         <div className="flex justify-end mb-4">
-          <div className="flex items-center gap-4 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 px-4 py-2">
-            <div className="text-right">
-              <p className="text-sm text-gray-300 font-medium">{user?.username}</p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+          <div className="flex items-center gap-4 glass-effect rounded-xl border border-cyan-500/20 px-5 py-3 shadow-lg shadow-cyan-500/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                {user?.username?.charAt(0).toUpperCase()}
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-200 font-semibold">{user?.username}</p>
+                <p className="text-xs text-gray-400">{user?.email}</p>
+              </div>
             </div>
             <Link
               to="/watchlist"
-              className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm"
+              className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm hover:scale-105 transition-transform duration-200"
               title="Go to Watchlist"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,7 +87,7 @@ function HomePage() {
             </Link>
             <button
               onClick={handleLogout}
-              className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 border-red-500 text-white"
+              className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 border-red-500 text-white hover:scale-105 transition-transform duration-200"
               title="Logout"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,10 +105,10 @@ function HomePage() {
 
         {/* Header section with title and description */}
         <header className="text-center mb-10 py-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-4 drop-shadow-lg">
             Random {mediaType ? 'Movie' : 'TV Show'} Generator
           </h1>
-          <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-3 text-gray-300 text-lg max-w-2xl mx-auto">
             Discover random movies and TV shows based on your preferences. Filter by genre, year, and
             rating to find your next favorite entertainment.
           </p>
@@ -132,7 +137,7 @@ function HomePage() {
               <button
                 onClick={generateRandomMedia}
                 disabled={isLoading}
-                className="btn-primary flex items-center mx-auto"
+                className="btn-primary flex items-center mx-auto gap-2 px-8 py-4 text-lg font-bold hover:scale-105 transition-all duration-300 shadow-lg shadow-cyan-500/30"
               >
                 {isLoading ? (
                   <>
@@ -140,16 +145,26 @@ function HomePage() {
                     Loading...
                   </>
                 ) : (
-                  'Generate Random Content'
+                  <>
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Generate Random Content
+                  </>
                 )}
               </button>
             </div>
 
             {/* Error message display */}
             {error && (
-              <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-xl border border-red-700/50 backdrop-blur-sm">
-                <div className="font-bold mb-1">Error</div>
-                <div>{error}</div>
+              <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-xl border border-red-700/50 backdrop-blur-sm flex items-start gap-3">
+                <svg className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <div className="font-bold mb-1">Error</div>
+                  <div>{error}</div>
+                </div>
               </div>
             )}
 
@@ -158,29 +173,32 @@ function HomePage() {
 
             {/* Viewed media counter and list */}
             {viewedMedia.length > 0 && (
-              <div className="mt-6 p-6 bg-gray-800/30 rounded-xl border border-gray-700/50 backdrop-blur-sm">
-                <div className="text-center text-gray-400 mb-4">
-                  You've discovered {viewedMedia.length} content items in this session
+              <div className="mt-6 p-6 glass-effect rounded-xl border border-cyan-500/20 backdrop-blur-sm">
+                <div className="text-center mb-4">
+                  <span className="text-cyan-400 font-bold text-lg">
+                    You've discovered {viewedMedia.length} content items
+                  </span>
+                  <span className="text-gray-400 text-sm ml-2">in this session</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {viewedMedia.map(function (media, index) {
                     const title = media.title || media.name;
                     const posterPath = media.poster_path;
                     return (
                       <div
                         key={media.id || index}
-                        className="flex flex-col items-center gap-2 text-sm text-white font-semibold p-3 bg-gray-800/50 rounded-lg border border-gray-700/30"
+                        className="flex flex-col items-center gap-2 text-sm text-white font-semibold p-3 bg-slate-800/80 rounded-lg border border-slate-700/50 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 hover:scale-105 cursor-pointer"
                       >
                         {posterPath ? (
                           <img
                             src={`https://image.tmdb.org/t/p/w500${posterPath}`}
                             alt={title}
-                            className="w-full h-auto object-cover rounded"
+                            className="w-full h-auto object-cover rounded shadow-md"
                           />
                         ) : (
-                          <div className="w-full aspect-[2/3] bg-gray-700 rounded flex items-center justify-center">
+                          <div className="w-full aspect-[2/3] bg-slate-700 rounded flex items-center justify-center">
                             <svg
-                              className="w-12 h-12 text-gray-600"
+                              className="w-12 h-12 text-slate-600"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -249,7 +267,7 @@ function HomePage() {
       </div>
 
       {/* Mobile sticky generate button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 px-4 py-3 flex items-center justify-between lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-cyan-500/30 px-4 py-3 flex items-center justify-between lg:hidden backdrop-blur-md">
         <span className="text-sm text-gray-300">
           Generate a new {mediaType ? 'movie' : 'TV content'}
         </span>
@@ -257,7 +275,7 @@ function HomePage() {
           type="button"
           onClick={generateRandomMedia}
           disabled={isLoading}
-          className="btn-primary flex items-center px-4 py-2 text-sm"
+          className="btn-primary flex items-center px-4 py-2 text-sm gap-2 shadow-lg shadow-cyan-500/30"
         >
           {isLoading ? (
             <>
@@ -265,7 +283,12 @@ function HomePage() {
               Loading...
             </>
           ) : (
-            'Generate'
+            <>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Generate
+            </>
           )}
         </button>
       </div>

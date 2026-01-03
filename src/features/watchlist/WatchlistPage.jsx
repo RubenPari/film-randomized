@@ -21,26 +21,26 @@ export function WatchlistItemCard({ item, onRemove }) {
   const genres = item.genres ? JSON.parse(item.genres) : [];
 
   return (
-    <div className="group bg-gray-800/30 rounded-xl border border-gray-700/50 overflow-hidden hover:border-gray-600 hover:scale-105 transition-all duration-200">
+    <div className="group bg-gradient-to-br from-slate-800/40 to-slate-900/40 rounded-2xl border border-slate-700/50 overflow-hidden hover:border-cyan-500/40 shadow-lg hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
       {/* Poster */}
       <div className="relative">
         <a
           href={`https://www.themoviedb.org/${item.media_type ? 'movie' : 'tv'}/${item.tmdb_id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block relative aspect-[2/3] bg-gray-800 hover:opacity-90 transition-opacity"
+          className="block relative aspect-[2/3] bg-slate-900 overflow-hidden group/poster"
           title={`View ${item.title} on TMDB`}
         >
           {item.poster_path ? (
             <img
               src={`${IMAGE_BASE_URL}${item.poster_path}`}
               alt={item.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover/poster:scale-110"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
               <svg
-                className="w-16 h-16 text-gray-600"
+                className="w-16 h-16 text-slate-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -56,7 +56,7 @@ export function WatchlistItemCard({ item, onRemove }) {
           )}
 
           {/* Media type badge */}
-          <div className="absolute top-2 right-2 px-2 py-1 bg-gray-900/90 backdrop-blur-sm rounded text-xs font-medium text-white">
+          <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-cyan-600/90 to-blue-600/90 backdrop-blur-xl rounded-lg text-xs font-bold text-white shadow-lg border border-cyan-400/30">
             {item.media_type ? 'Movie' : 'TV'}
           </div>
         </a>
@@ -66,7 +66,7 @@ export function WatchlistItemCard({ item, onRemove }) {
           onClick={function () {
             onRemove(item.tmdb_id);
           }}
-          className="absolute top-2 left-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors opacity-0 group-hover:opacity-100 z-10"
+          className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-2.5 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg hover:shadow-xl z-10 transform hover:scale-110"
           title="Remove from watchlist"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,16 +81,20 @@ export function WatchlistItemCard({ item, onRemove }) {
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 min-h-[2.5rem]">
+      <div className="p-4 space-y-3">
+        <h3 className="font-bold text-white text-sm mb-2 line-clamp-2 min-h-[2.5rem] group-hover:text-cyan-300 transition-colors duration-300">
           {item.title}
         </h3>
 
-        <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-          {item.release_date && <span>{new Date(item.release_date).getFullYear()}</span>}
+        <div className="flex items-center justify-between text-xs text-slate-400 mb-2 space-x-2">
+          {item.release_date && (
+            <span className="px-2 py-1 bg-slate-700/40 rounded-md font-medium">
+              {new Date(item.release_date).getFullYear()}
+            </span>
+          )}
           {item.vote_average && (
-            <span className="text-yellow-400 flex items-center gap-1">
-              <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
+            <span className="text-amber-400 flex items-center gap-1.5 px-2 py-1 bg-amber-500/10 rounded-md font-semibold">
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
               </svg>
               {item.vote_average.toFixed(1)}
@@ -99,12 +103,12 @@ export function WatchlistItemCard({ item, onRemove }) {
         </div>
 
         {genres.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5 pt-1">
             {genres.slice(0, 2).map(function (genre) {
               return (
                 <span
                   key={genre.id}
-                  className="text-xs px-2 py-0.5 bg-gray-700/50 text-gray-300 rounded"
+                  className="text-xs px-2.5 py-1 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 text-cyan-300 rounded-lg border border-cyan-500/30 hover:border-cyan-500/60 transition-colors duration-300 font-medium backdrop-blur-sm"
                 >
                   {genre.name}
                 </span>
@@ -189,15 +193,15 @@ function WatchlistPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
-      <header className="bg-gray-900/50 border-b border-gray-700 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="glass-effect border-b border-slate-700/50 sticky top-0 z-10 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
                 to="/"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-slate-400 hover:text-cyan-400 transition-all duration-300 hover:scale-110 transform"
                 title="Back to home"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,7 +213,9 @@ function WatchlistPage() {
                   />
                 </svg>
               </Link>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">My Watchlist</h1>
+              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
+                My Watchlist
+              </h1>
             </div>
 
             {/* Filter tabs */}
@@ -218,10 +224,10 @@ function WatchlistPage() {
                 onClick={function () {
                   setFilter('all');
                 }}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 transform ${
                   filter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105'
+                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600/50'
                 }`}
               >
                 All
@@ -230,10 +236,10 @@ function WatchlistPage() {
                 onClick={function () {
                   setFilter('movies');
                 }}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 transform ${
                   filter === 'movies'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105'
+                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600/50'
                 }`}
               >
                 Movies
@@ -242,10 +248,10 @@ function WatchlistPage() {
                 onClick={function () {
                   setFilter('tv');
                 }}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 transform ${
                   filter === 'tv'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105'
+                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600/50'
                 }`}
               >
                 TV Shows
@@ -260,37 +266,55 @@ function WatchlistPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="loading-spinner mr-3"></div>
-            <span className="text-gray-400 text-lg">Loading...</span>
+            <span className="text-slate-300 text-lg font-medium">Loading your watchlist...</span>
           </div>
         ) : error ? (
-          <div className="p-6 bg-red-900/50 text-red-200 rounded-xl border border-red-700/50 max-w-2xl mx-auto">
-            <div className="font-bold mb-2 text-xl">Error</div>
-            <div>{error}</div>
+          <div className="p-8 bg-gradient-to-r from-red-900/40 to-red-800/40 text-red-200 rounded-2xl border border-red-700/50 max-w-2xl mx-auto backdrop-blur-sm shadow-lg">
+            <div className="flex items-start gap-4">
+              <svg className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4v2m0 0v2m0-6v-2m0 6v2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <div className="font-bold mb-2 text-xl">Error Loading Watchlist</div>
+                <div className="text-red-100">{error}</div>
+              </div>
+            </div>
           </div>
         ) : filteredWatchlist.length === 0 ? (
-          <div className="text-center py-20">
-            <svg
-              className="w-24 h-24 mx-auto text-gray-600 mb-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-            <p className="text-gray-400 text-2xl font-semibold mb-2">
+          <div className="text-center py-24 px-6">
+            <div className="mb-8 inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50">
+              <svg
+                className="w-16 h-16 text-slate-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            </div>
+            <h2 className="text-slate-200 text-3xl font-bold mb-3">
               {filter === 'all'
                 ? 'Your watchlist is empty'
-                : `No ${filter === 'movies' ? 'movies' : 'TV shows'} in watchlist`}
+                : `No ${filter === 'movies' ? 'movies' : 'TV shows'} yet`}
+            </h2>
+            <p className="text-slate-400 text-lg mb-8 max-w-md mx-auto">
+              {filter === 'all'
+                ? 'Start building your watchlist by adding movies and TV shows you want to watch.'
+                : `You haven't added any ${filter === 'movies' ? 'movies' : 'TV shows'} to your watchlist yet.`}
             </p>
-            <p className="text-gray-500 mb-6">Go back home and add content to watch!</p>
             <Link
               to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transform hover:-translate-y-1"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -306,15 +330,22 @@ function WatchlistPage() {
         ) : (
           <>
             {/* Stats */}
-            <div className="mb-6 flex items-center justify-between">
-              <p className="text-gray-400">
-                {filteredWatchlist.length}{' '}
-                {filteredWatchlist.length === 1 ? 'item' : 'items'}
-              </p>
+            <div className="mb-8 px-6 py-4 rounded-2xl glass-effect border border-slate-700/50">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <p className="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Total Items</p>
+                  <p className="text-4xl font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
+                    {filteredWatchlist.length}
+                  </p>
+                </div>
+                <div className="hidden md:block text-slate-600">
+                  <p className="text-sm">{filteredWatchlist.length === 1 ? 'item' : 'items'} in your watchlist</p>
+                </div>
+              </div>
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 animate-fade-in">
               {filteredWatchlist.map(function (item) {
                 return <WatchlistItemCard key={item.id} item={item} onRemove={handleRemove} />;
               })}
