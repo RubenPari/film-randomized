@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../shared/context/AuthContext.jsx';
 import { getWatchlist, removeFromWatchlist } from '../../shared/services/watchlistApi.js';
 import { IMAGE_BASE_URL } from '../../shared/constants/api.js';
@@ -18,6 +19,7 @@ import { IMAGE_BASE_URL } from '../../shared/constants/api.js';
  * @returns {JSX.Element} Watchlist item card
  */
 export function WatchlistItemCard({ item, onRemove }) {
+  const { t } = useTranslation();
   const genres = item.genres ? JSON.parse(item.genres) : [];
 
   return (
@@ -29,7 +31,7 @@ export function WatchlistItemCard({ item, onRemove }) {
           target="_blank"
           rel="noopener noreferrer"
           className="block relative aspect-[2/3] bg-slate-900 overflow-hidden group/poster"
-          title={`View ${item.title} on TMDB`}
+          title={t('media.onTmdb', { title: item.title })}
         >
           {item.poster_path ? (
             <img
@@ -57,7 +59,7 @@ export function WatchlistItemCard({ item, onRemove }) {
 
           {/* Media type badge */}
           <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-cyan-600/90 to-blue-600/90 backdrop-blur-xl rounded-lg text-xs font-bold text-white shadow-lg border border-cyan-400/30">
-            {item.media_type ? 'Movie' : 'TV'}
+            {item.media_type ? t('common.movies').slice(0, -1) : 'TV'}
           </div>
         </a>
 
@@ -67,7 +69,7 @@ export function WatchlistItemCard({ item, onRemove }) {
             onRemove(item.tmdb_id);
           }}
           className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-2.5 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg hover:shadow-xl z-10 transform hover:scale-110"
-          title="Remove from watchlist"
+          title={t('media.remove')}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -128,6 +130,7 @@ export function WatchlistItemCard({ item, onRemove }) {
  * @returns {JSX.Element} Watchlist page
  */
 function WatchlistPage() {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [watchlist, setWatchlist] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -156,7 +159,7 @@ function WatchlistPage() {
       const data = await getWatchlist(token);
       setWatchlist(data);
     } catch (err) {
-      setError('Error loading watchlist');
+      setError(t('watchlist.errorTitle'));
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -202,7 +205,7 @@ function WatchlistPage() {
               <Link
                 to="/"
                 className="text-slate-400 hover:text-cyan-400 transition-all duration-300 hover:scale-110 transform"
-                title="Back to home"
+                title={t('common.back')}
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -214,7 +217,7 @@ function WatchlistPage() {
                 </svg>
               </Link>
               <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
-                My Watchlist
+                {t('watchlist.title')}
               </h1>
             </div>
 
@@ -230,7 +233,7 @@ function WatchlistPage() {
                     : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600/50'
                 }`}
               >
-                All
+                {t('common.all')}
               </button>
               <button
                 onClick={function () {
@@ -242,7 +245,7 @@ function WatchlistPage() {
                     : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600/50'
                 }`}
               >
-                Movies
+                {t('common.movies')}
               </button>
               <button
                 onClick={function () {
@@ -254,7 +257,7 @@ function WatchlistPage() {
                     : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600/50'
                 }`}
               >
-                TV Shows
+                {t('common.tvShows')}
               </button>
             </div>
           </div>
@@ -266,7 +269,7 @@ function WatchlistPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="loading-spinner mr-3"></div>
-            <span className="text-slate-300 text-lg font-medium">Loading your watchlist...</span>
+            <span className="text-slate-300 text-lg font-medium">{t('watchlist.loading')}</span>
           </div>
         ) : error ? (
           <div className="p-8 bg-gradient-to-r from-red-900/40 to-red-800/40 text-red-200 rounded-2xl border border-red-700/50 max-w-2xl mx-auto backdrop-blur-sm shadow-lg">
@@ -280,7 +283,7 @@ function WatchlistPage() {
                 />
               </svg>
               <div>
-                <div className="font-bold mb-2 text-xl">Error Loading Watchlist</div>
+                <div className="font-bold mb-2 text-xl">{t('watchlist.errorTitle')}</div>
                 <div className="text-red-100">{error}</div>
               </div>
             </div>
@@ -304,13 +307,13 @@ function WatchlistPage() {
             </div>
             <h2 className="text-slate-200 text-3xl font-bold mb-3">
               {filter === 'all'
-                ? 'Your watchlist is empty'
-                : `No ${filter === 'movies' ? 'movies' : 'TV shows'} yet`}
+                ? t('watchlist.empty')
+                : filter === 'movies' ? t('watchlist.emptyMovies') : t('watchlist.emptyTv')}
             </h2>
             <p className="text-slate-400 text-lg mb-8 max-w-md mx-auto">
               {filter === 'all'
-                ? 'Start building your watchlist by adding movies and TV shows you want to watch.'
-                : `You haven't added any ${filter === 'movies' ? 'movies' : 'TV shows'} to your watchlist yet.`}
+                ? t('watchlist.emptyDescription')
+                : t('watchlist.emptyFilterDescription', { type: filter === 'movies' ? t('common.movies').toLowerCase() : t('common.tvShows').toLowerCase() })}
             </p>
             <Link
               to="/"
@@ -324,7 +327,7 @@ function WatchlistPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Discover new content
+              {t('watchlist.discoverContent')}
             </Link>
           </div>
         ) : (
@@ -333,13 +336,13 @@ function WatchlistPage() {
             <div className="mb-8 px-6 py-4 rounded-2xl glass-effect border border-slate-700/50">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                  <p className="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Total Items</p>
+                  <p className="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">{t('watchlist.totalItems')}</p>
                   <p className="text-4xl font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
                     {filteredWatchlist.length}
                   </p>
                 </div>
                 <div className="hidden md:block text-slate-600">
-                  <p className="text-sm">{filteredWatchlist.length === 1 ? 'item' : 'items'} in your watchlist</p>
+                  <p className="text-sm">{filteredWatchlist.length} {filteredWatchlist.length === 1 ? t('watchlist.item') : t('watchlist.items')} {t('home.sessionInfo')}</p>
                 </div>
               </div>
             </div>
