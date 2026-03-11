@@ -3,6 +3,7 @@
  * Allows users to filter media by release year range.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Component for filtering media by release year range.
@@ -15,17 +16,18 @@ import React from 'react';
  * @returns {JSX.Element} Year filter component
  */
 function YearFilter({ releaseYearFrom, releaseYearTo, setReleaseYearFrom, setReleaseYearTo }) {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
     <div>
-      <h2 className="filter-title">Release Year</h2>
+      <h2 className="filter-title">{t('filters.year')}</h2>
       <p className="text-sm text-gray-400 mb-3">
-        Choose a year range to limit the search.
+        {t('filters.yearDescription')}
       </p>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm mb-1 text-gray-300">From</label>
+          <label className="block text-sm mb-1 text-gray-300">{t('filters.from')}</label>
           <input
             type="number"
             min="1900"
@@ -36,7 +38,7 @@ function YearFilter({ releaseYearFrom, releaseYearTo, setReleaseYearFrom, setRel
           />
         </div>
         <div>
-          <label className="block text-sm mb-1 text-gray-300">To</label>
+          <label className="block text-sm mb-1 text-gray-300">{t('filters.to')}</label>
           <input
             type="number"
             min="1900"

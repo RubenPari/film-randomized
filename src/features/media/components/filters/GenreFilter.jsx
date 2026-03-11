@@ -3,6 +3,7 @@
  * Allows users to select multiple genres to filter media.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Component for selecting genres to filter media.
@@ -15,9 +16,11 @@ import React from 'react';
  * @returns {JSX.Element} Genre filter component
  */
 function GenreFilter({ genres, selectedGenres, handleGenreToggle }) {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <h2 className="filter-title">Genres</h2>
+      <h2 className="filter-title">{t('filters.genres')}</h2>
       <div className="max-h-64 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-cyan-600 scrollbar-track-slate-800">
         <div className="grid grid-cols-1 gap-2">
           {genres.map(function(genre) {

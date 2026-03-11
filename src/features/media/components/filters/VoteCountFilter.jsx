@@ -3,6 +3,7 @@
  * Allows users to filter media by minimum number of votes.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Component for filtering media by minimum vote count.
@@ -14,8 +15,10 @@ import React from 'react';
  * @returns {JSX.Element} Vote count filter component
  */
 function VoteCountFilter({ minVoteCount, setMinVoteCount }) {
+  const { t } = useTranslation();
+
   const voteCountRanges = [
-    { value: 0, label: 'All' },
+    { value: 0, label: t('common.all') },
     { value: 1000, label: '1,000+' },
     { value: 10000, label: '10,000+' },
     { value: 50000, label: '50,000+' },
@@ -25,7 +28,7 @@ function VoteCountFilter({ minVoteCount, setMinVoteCount }) {
   return (
     <div>
       <label className="filter-label">
-        Minimum Number of Votes
+        {t('filters.voteCount')}
       </label>
       <div className="flex flex-wrap gap-2">
         {voteCountRanges.map(function(range) {
