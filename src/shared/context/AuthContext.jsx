@@ -100,12 +100,27 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
+  const forgotPassword = async (email) => {
+    return await authApi.forgotPassword(email);
+  };
+
+  const resetPassword = async (tokenParam, newPassword) => {
+    return await authApi.resetPassword(tokenParam, newPassword);
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    return await authApi.changePassword(currentPassword, newPassword, token);
+  };
+
   const value = {
     user,
     token,
     login,
     register,
     logout,
+    forgotPassword,
+    resetPassword,
+    changePassword,
     isAuthenticated: !!token && !!user,
     loading,
   };
