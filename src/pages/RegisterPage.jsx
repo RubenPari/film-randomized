@@ -2,58 +2,46 @@
  * Register page component.
  * Handles new user registration with username, email, and password.
  */
-import React, { useState } from 'react';
+import React, { useActionState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext.jsx';
 
 /**
  * Register page component.
- * Provides a form for user registration with validation.
+ * Provides a form for user registration using React 19 useActionState.
  * 
  * @returns {JSX.Element} Register page with registration form
  */
 function RegisterPage() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  /**
-   * Handles form submission for registration.
-   * Validates password length and confirmation before submitting.
-   * 
-   * @param {Event} e - Form submit event
-   */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  // React 19 action state for forms
+  const [error, submitAction, isPending] = useActionState(
+    async (previousState, formData) => {
+      const username = formData.get('username');
+      const email = formData.get('email');
+      const password = formData.get('password');
+      const confirmPassword = formData.get('confirmPassword');
+      
+      if (password.length < 6) {
+        return 'Password must be at least 6 characters';
+      }
 
-    // Validation
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await register(username, email, password);
-      navigate('/');
-    } catch (err) {
-      setError(err.message || 'Error during registration');
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (password !== confirmPassword) {
+        return 'Passwords do not match';
+      }
+      
+      try {
+        await register(username, email, password);
+        navigate('/');
+        return null;
+      } catch (err) {
+        return err.message || 'Error during registration';
+      }
+    },
+    null
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -80,20 +68,19 @@ function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form action={submitAction} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-bold text-slate-300 mb-2">
                 Username
               </label>
               <input
                 id="username"
+                name="username"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 required
                 className="w-full px-4 py-3.5 bg-slate-700/30 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                 placeholder="Choose a username"
-                disabled={loading}
+                disabled={isPending}
               />
             </div>
 
@@ -103,13 +90,12 @@ function RegisterPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-3.5 bg-slate-700/30 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                 placeholder="your.email@example.com"
-                disabled={loading}
+                disabled={isPending}
               />
             </div>
 
@@ -119,14 +105,13 @@ function RegisterPage() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
                 className="w-full px-4 py-3.5 bg-slate-700/30 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                 placeholder="Minimum 6 characters"
-                disabled={loading}
+                disabled={isPending}
               />
             </div>
 
@@ -136,22 +121,21 @@ function RegisterPage() {
               </label>
               <input
                 id="confirmPassword"
+                name="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3.5 bg-slate-700/30 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                 placeholder="Repeat your password"
-                disabled={loading}
+                disabled={isPending}
               />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="w-full btn-primary py-4 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-6 group"
             >
-              {loading ? (
+              {isPending ? (
                 <div className="flex items-center justify-center gap-3">
                   <div className="loading-spinner w-5 h-5"></div>
                   <span>Creating account...</span>

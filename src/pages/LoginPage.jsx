@@ -2,7 +2,7 @@
  * Login page component.
  * Handles user authentication with username and password.
  */
-import React, { useState } from 'react';
+import React, { useActionState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../shared/context/AuthContext.jsx';
@@ -10,38 +10,31 @@ import LanguageSwitcher from '../shared/components/LanguageSwitcher.jsx';
 
 /**
  * Login page component.
- * Provides a form for user authentication.
+ * Provides a form for user authentication using React 19 useActionState.
  * 
  * @returns {JSX.Element} Login page with authentication form
  */
 function LoginPage() {
   const { t } = useTranslation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  /**
-   * Handles form submission for login.
-   * 
-   * @param {Event} e - Form submit event
-   */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await login(username, password);
-      navigate('/');
-    } catch (err) {
-      setError(err.message || t('auth.loginError'));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // React 19 action state for forms
+  const [error, submitAction, isPending] = useActionState(
+    async (previousState, formData) => {
+      const username = formData.get('username');
+      const password = formData.get('password');
+      
+      try {
+        await login(username, password);
+        navigate('/');
+        return null;
+      } catch (err) {
+        return err.message || t('auth.loginError');
+      }
+    },
+    null
+  );
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -71,20 +64,19 @@ function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form action={submitAction} className="space-y-5">
             <div>
               <label htmlFor="username" className="block text-sm font-bold text-slate-300 mb-2">
                 {t('auth.username')}
               </label>
               <input
                 id="username"
+                name="username"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 required
                 className="w-full px-4 py-3.5 bg-slate-700/30 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                 placeholder={t('auth.usernamePlaceholder')}
-                disabled={loading}
+                disabled={isPending}
               />
             </div>
 
@@ -99,22 +91,21 @@ function LoginPage() {
               </div>
               <input
                 id="password"
+                name="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3.5 bg-slate-700/30 border border-slate-600/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                 placeholder={t('auth.passwordPlaceholder')}
-                disabled={loading}
+                disabled={isPending}
               />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="w-full btn-primary py-4 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-6 group"
             >
-              {loading ? (
+              {isPending ? (
                 <div className="flex items-center justify-center gap-3">
                   <div className="loading-spinner w-5 h-5"></div>
                   <span>{t('auth.signingIn')}</span>
