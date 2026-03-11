@@ -3,6 +3,7 @@
  * Handles adding and removing items from the user's watchlist.
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../shared/context/AuthContext.jsx';
 import {
   addToWatchlist,
@@ -20,6 +21,7 @@ import {
  * @returns {JSX.Element} Save buttons component
  */
 function SaveButtons({ media, mediaType }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +109,7 @@ function SaveButtons({ media, mediaType }) {
             {isLoading ? (
               <>
                 <div className="loading-spinner"></div>
-                Adding...
+                {t('media.adding')}
               </>
             ) : (
               <>
@@ -119,7 +121,7 @@ function SaveButtons({ media, mediaType }) {
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                Add to Watchlist
+                {t('media.save')}
               </>
             )}
           </button>
@@ -132,14 +134,14 @@ function SaveButtons({ media, mediaType }) {
             {isLoading ? (
               <>
                 <div className="loading-spinner"></div>
-                Removing...
+                {t('media.removing')}
               </>
             ) : (
               <>
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
-                In Watchlist
+                {t('media.saved')}
               </>
             )}
           </button>

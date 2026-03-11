@@ -3,6 +3,7 @@
  * Displays detailed information about a media item including poster, title, description, and trailer.
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IMAGE_BASE_URL } from '../../../shared/constants/api.js';
 import { fetchMediaVideos } from '../../../shared/services/tmdbApi.js';
 import SaveButtons from './SaveButtons.jsx';
@@ -24,6 +25,7 @@ import SaveButtons from './SaveButtons.jsx';
  * @returns {JSX.Element} Media card component
  */
 function MediaCard({ media, mediaType }) {
+  const { t } = useTranslation();
   // Extract title based on media type (movie or TV show)
   const title = media.title || media.name;
 
@@ -100,7 +102,7 @@ function MediaCard({ media, mediaType }) {
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="mt-2 text-slate-500">No image available</span>
+                <span className="mt-2 text-slate-500">{t('common.noImage')}</span>
               </div>
             </div>
           )}
@@ -151,7 +153,7 @@ function MediaCard({ media, mediaType }) {
                   }}
                   className="mt-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors"
                 >
-                  {isOverviewExpanded ? 'Show less' : 'Show more'}
+                  {isOverviewExpanded ? t('common.showLess') : t('common.showMore')}
                 </button>
               )}
             </div>
@@ -169,14 +171,14 @@ function MediaCard({ media, mediaType }) {
             <svg className="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
               <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
             </svg>
-            Trailer
+            {t('common.trailer')}
           </h3>
           <div className="aspect-video w-full rounded-lg overflow-hidden shadow-xl">
             <iframe
               width="100%"
               height="100%"
               src={`https://www.youtube.com/embed/${trailerKey}`}
-              title="Trailer"
+              title={t('common.trailer')}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
