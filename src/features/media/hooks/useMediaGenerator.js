@@ -2,6 +2,7 @@ import { useTransition } from 'react';
 import { useMediaFilters } from './useMediaFilters';
 import { useGenres } from './useGenres';
 import { useMediaFetcher } from './useMediaFetcher';
+import { useMediaHistory } from './useMediaHistory';
 
 /**
  * Custom hook for managing media generation state and logic.
@@ -21,15 +22,14 @@ export function useMediaGenerator() {
 
   const { genres, error: genresError } = useGenres();
   
+  const historyManager = useMediaHistory();
+
   const {
     randomMedia,
     isLoading: isFetching,
     error: fetchError,
-    viewedMedia,
     generateRandomMedia,
-    exportViewedMedia,
-    importViewedMedia,
-  } = useMediaFetcher();
+  } = useMediaFetcher(historyManager);
 
   // useTransition for fluid UI updates when modifying non-critical states (like filters)
   const [isPendingFilter, startTransition] = useTransition();
@@ -67,9 +67,9 @@ export function useMediaGenerator() {
     randomMedia,
     isLoading: isFetching || isPendingFilter,
     error: fetchError || genresError,
-    viewedMedia,
+    viewedMedia: historyManager.viewedMedia,
     generateRandomMedia: handleGenerateRandomMedia,
-    exportViewedMedia,
-    importViewedMedia,
+    exportViewedMedia: historyManager.exportViewedMedia,
+    importViewedMedia: historyManager.importViewedMedia,
   };
 }
