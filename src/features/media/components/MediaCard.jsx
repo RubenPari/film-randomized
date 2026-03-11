@@ -33,7 +33,6 @@ function MediaCard({ media, mediaType }) {
 
   // State for trailer video
   const [trailerKey, setTrailerKey] = useState(null);
-  const [isTrailerCollapsed, setIsTrailerCollapsed] = useState(false);
 
   // State for description expansion
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
@@ -158,47 +157,34 @@ function MediaCard({ media, mediaType }) {
             </div>
           )}
 
-          {/* Trailer section */}
-          {trailerKey && (
-            <div className="mb-4">
-              <button
-                onClick={function () {
-                  setIsTrailerCollapsed(function (prev) {
-                    return !prev;
-                  });
-                }}
-                className="flex items-center gap-2 font-medium mb-2 group"
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition-transform duration-200">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                  </svg>
-                </div>
-                <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors">
-                  {isTrailerCollapsed ? 'Show Trailer' : 'Hide Trailer'}
-                </span>
-              </button>
-              {!isTrailerCollapsed && (
-                <div className="aspect-video rounded-lg overflow-hidden shadow-xl">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${trailerKey}`}
-                    title="Trailer"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="rounded-lg"
-                  ></iframe>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Save buttons */}
           <SaveButtons media={media} mediaType={mediaType} />
         </div>
       </div>
+
+      {/* Trailer section */}
+      {trailerKey && (
+        <div className="p-6 pt-0 mt-4 md:mt-0 md:px-6 md:pb-6">
+          <h3 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
+            <svg className="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+            </svg>
+            Trailer
+          </h3>
+          <div className="aspect-video w-full rounded-lg overflow-hidden shadow-xl">
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${trailerKey}`}
+              title="Trailer"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="rounded-lg"
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
