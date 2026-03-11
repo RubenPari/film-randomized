@@ -4,6 +4,7 @@
  */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../shared/context/AuthContext.jsx';
 import { useMediaGenerator } from '../features/media/hooks/useMediaGenerator.js';
 import MediaTypeSelector from '../features/media/components/filters/MediaTypeSelector.jsx';
@@ -12,6 +13,7 @@ import YearFilter from '../features/media/components/filters/YearFilter.jsx';
 import VoteCountFilter from '../features/media/components/filters/VoteCountFilter.jsx';
 import GenreFilter from '../features/media/components/filters/GenreFilter.jsx';
 import MediaCard from '../features/media/components/MediaCard.jsx';
+import LanguageSwitcher from '../shared/components/LanguageSwitcher.jsx';
 
 /**
  * Home page component.
@@ -20,6 +22,7 @@ import MediaCard from '../features/media/components/MediaCard.jsx';
  * @returns {JSX.Element} Home page with media generator
  */
 function HomePage() {
+  const { t } = useTranslation();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -59,7 +62,8 @@ function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 pb-24 md:p-8 md:pb-8">
       <div className="max-w-6xl mx-auto">
         {/* User header */}
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <LanguageSwitcher />
           <div className="flex items-center gap-4 glass-effect rounded-xl border border-cyan-500/20 px-5 py-3 shadow-lg shadow-cyan-500/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
@@ -73,7 +77,7 @@ function HomePage() {
             <Link
               to="/watchlist"
               className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm hover:scale-105 transition-transform duration-200"
-              title="Go to Watchlist"
+              title={t('common.watchlist')}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -83,12 +87,12 @@ function HomePage() {
                   d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                 />
               </svg>
-              <span className="hidden md:inline">Watchlist</span>
+              <span className="hidden md:inline">{t('common.watchlist')}</span>
             </Link>
             <button
               onClick={handleLogout}
               className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 border-red-500 text-white hover:scale-105 transition-transform duration-200"
-              title="Logout"
+              title={t('common.logout')}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -98,7 +102,7 @@ function HomePage() {
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-              <span className="hidden md:inline">Logout</span>
+              <span className="hidden md:inline">{t('common.logout')}</span>
             </button>
           </div>
         </div>
@@ -106,11 +110,10 @@ function HomePage() {
         {/* Header section with title and description */}
         <header className="text-center mb-10 py-8">
           <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-4 drop-shadow-lg">
-            Random {mediaType ? 'Movie' : 'TV Show'} Generator
+            {t('home.title', { type: mediaType ? t('home.movie') : t('home.tvShow') })}
           </h1>
           <p className="mt-3 text-gray-300 text-lg max-w-2xl mx-auto">
-            Discover random movies and TV shows based on your preferences. Filter by genre, year, and
-            rating to find your next favorite entertainment.
+            {t('home.description')}
           </p>
         </header>
 
@@ -128,7 +131,7 @@ function HomePage() {
                 }}
                 className="inline-flex items-center px-3 py-2 text-sm rounded-lg border border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
               >
-                {filtersOpen ? 'Hide filters' : 'Show filters'}
+                {filtersOpen ? t('home.hideFilters') : t('home.showFilters')}
               </button>
             </div>
 
@@ -142,14 +145,14 @@ function HomePage() {
                 {isLoading ? (
                   <>
                     <div className="loading-spinner mr-2"></div>
-                    Loading...
+                    {t('common.loading')}
                   </>
                 ) : (
                   <>
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    Generate Random Content
+                    {t('home.generate')}
                   </>
                 )}
               </button>
@@ -162,7 +165,7 @@ function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <div className="font-bold mb-1">Error</div>
+                  <div className="font-bold mb-1">{t('common.error')}</div>
                   <div>{error}</div>
                 </div>
               </div>
@@ -176,9 +179,9 @@ function HomePage() {
               <div className="mt-6 p-6 glass-effect rounded-xl border border-cyan-500/20 backdrop-blur-sm">
                 <div className="text-center mb-4">
                   <span className="text-cyan-400 font-bold text-lg">
-                    You've discovered {viewedMedia.length} content items
+                    {t('home.discoveredCount', { count: viewedMedia.length })}
                   </span>
-                  <span className="text-gray-400 text-sm ml-2">in this session</span>
+                  <span className="text-gray-400 text-sm ml-2">{t('home.sessionInfo')}</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {viewedMedia.map(function (media, index) {
@@ -269,7 +272,7 @@ function HomePage() {
       {/* Mobile sticky generate button */}
       <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-cyan-500/30 px-4 py-3 flex items-center justify-between lg:hidden backdrop-blur-md">
         <span className="text-sm text-gray-300">
-          Generate a new {mediaType ? 'movie' : 'TV content'}
+          {t('home.generateMobile', { type: mediaType ? t('home.movieMobile') : t('home.tvMobile') })}
         </span>
         <button
           type="button"
@@ -280,14 +283,14 @@ function HomePage() {
           {isLoading ? (
             <>
               <div className="loading-spinner mr-2"></div>
-              Loading...
+              {t('common.loading')}
             </>
           ) : (
             <>
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Generate
+              {t('home.generate')}
             </>
           )}
         </button>
