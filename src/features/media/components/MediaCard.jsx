@@ -49,12 +49,21 @@ function MediaCard({ media, mediaType }) {
       const loadTrailer = async function () {
         try {
           const videosData = await fetchMediaVideos(mediaType, media.id);
-          // Find the first YouTube trailer
-          const trailer = videosData.results?.find(function (video) {
-            return (
-              video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
-            );
-          });
+          const videos = videosData.results || [];
+          
+          // 1. Try to find a YouTube Trailer
+          let trailer = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+          
+          // 2. If not found, try a Teaser
+          if (!trailer) {
+            trailer = videos.find(v => v.site === 'YouTube' && v.type === 'Teaser');
+          }
+          
+          // 3. If still not found, take the first available YouTube video (Clip, Featurette, etc.)
+          if (!trailer) {
+            trailer = videos.find(v => v.site === 'YouTube');
+          }
+
           if (trailer) {
             setTrailerKey(trailer.key);
           } else {

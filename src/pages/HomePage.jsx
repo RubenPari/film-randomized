@@ -56,7 +56,31 @@ function HomePage() {
     setMinVoteCount,
     generateRandomMedia,
     handleGenreToggle,
+    exportViewedMedia,
+    importViewedMedia,
   } = useMediaGenerator();
+
+  const [importMessage, setImportMessage] = useState({ text: '', type: '' });
+
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const success = importViewedMedia(event.target.result);
+      if (success) {
+        setImportMessage({ text: t('home.importSuccess'), type: 'success' });
+      } else {
+        setImportMessage({ text: t('home.importError'), type: 'error' });
+      }
+      // Reset message after 3 seconds
+      setTimeout(() => setImportMessage({ text: '', type: '' }), 3000);
+    };
+    reader.readAsText(file);
+    // Reset input
+    e.target.value = '';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 pb-24 md:p-8 md:pb-8">
@@ -174,15 +198,48 @@ function HomePage() {
             {/* Media card display */}
             {randomMedia && !isLoading && <MediaCard media={randomMedia} mediaType={mediaType} />}
 
-            {/* Viewed media counter and list */}
-            {viewedMedia.length > 0 && (
-              <div className="mt-6 p-6 glass-effect rounded-xl border border-cyan-500/20 backdrop-blur-sm">
-                <div className="text-center mb-4">
-                  <span className="text-cyan-400 font-bold text-lg">
+            {/* Viewed media counter and session management */}
+            <div className="mt-6 p-6 glass-effect rounded-xl border border-cyan-500/20 backdrop-blur-sm">
+              <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4 border-b border-cyan-500/10 pb-4">
+                <div className="text-center md:text-left">
+                  <span className="text-cyan-400 font-bold text-lg block md:inline">
                     {t('home.discoveredCount', { count: viewedMedia.length })}
                   </span>
-                  <span className="text-gray-400 text-sm ml-2">{t('home.sessionInfo')}</span>
+                  <span className="text-gray-400 text-sm ml-0 md:ml-2">{t('home.sessionInfo')}</span>
                 </div>
+                
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={exportViewedMedia}
+                    disabled={viewedMedia.length === 0}
+                    className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-2 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={viewedMedia.length === 0 ? "Generate content first to export" : ""}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {t('home.exportSession')}
+                  </button>
+                  <label className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-2 hover:bg-slate-700 cursor-pointer">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    {t('home.importSession')}
+                    <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+                  </label>
+                </div>
+              </div>
+
+              {/* Import feedback message */}
+              {importMessage.text && (
+                <div className={`mb-4 p-3 rounded-lg text-sm text-center animate-fade-in ${
+                  importMessage.type === 'success' ? 'bg-green-900/40 text-green-200' : 'bg-red-900/40 text-red-200'
+                }`}>
+                  {importMessage.text}
+                </div>
+              )}
+
+              {viewedMedia.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {viewedMedia.map(function (media, index) {
                     const title = media.title || media.name;
@@ -220,8 +277,12 @@ function HomePage() {
                     );
                   })}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-4 text-gray-500 text-sm italic">
+                  No content discovered yet in this session.
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Filter section - left column */}

@@ -4,18 +4,27 @@
  */
 
 /**
- * Filters out media that has already been viewed or doesn't have a valid description.
+ * Filters out media that has already been viewed, is in the watchlist, or doesn't have a valid description.
  * 
  * @param {Array<Object>} results - Array of media items from API
  * @param {Array<Object>} viewedMedia - Array of already viewed media items
+ * @param {Array<Object>} watchlist - Array of items in the user's watchlist
  * @returns {Array<Object>} Filtered array of valid media items
  */
-export function filterValidMedia(results, viewedMedia) {
+export function filterValidMedia(results, viewedMedia, watchlist = []) {
     return results.filter(
         function(media) {
-            return !viewedMedia.some(function(viewed) { 
+            // Check if already viewed in this session
+            const isViewed = viewedMedia.some(function(viewed) { 
                 return viewed.id === media.id; 
-            }) &&
+            });
+
+            // Check if already in user's watchlist
+            const isInWatchlist = watchlist.some(function(item) {
+                return item.tmdb_id === media.id;
+            });
+
+            return !isViewed && !isInWatchlist &&
             media.overview &&
             media.overview.trim() !== '' &&
             media.overview !== 'Nessuna descrizione disponibile in italiano.';

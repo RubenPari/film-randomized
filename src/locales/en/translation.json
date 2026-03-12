@@ -27,7 +27,11 @@
     "movieMobile": "movie",
     "tvMobile": "TV content",
     "discoveredCount": "You've discovered {{count}} content items",
-    "sessionInfo": "in this session"
+    "sessionInfo": "in this session",
+    "exportSession": "Export Session",
+    "importSession": "Import Session",
+    "importSuccess": "Session imported successfully!",
+    "importError": "Failed to import session. Please check the file."
   },
   "filters": {
     "mediaType": "Media Type",
