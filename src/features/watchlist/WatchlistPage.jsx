@@ -2,7 +2,7 @@
  * Watchlist page component.
  * Displays and manages the user's watchlist with filtering capabilities.
  */
-import React, { useState, useEffect, use, Suspense, useOptimistic, startTransition } from 'react';
+import React, { useState, useEffect, use, Suspense, startTransition } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../shared/context/AuthContext.jsx';
@@ -101,17 +101,19 @@ function WatchlistContent({ watchlistPromise, filter, token }) {
   const { t } = useTranslation();
   const initialWatchlist = use(watchlistPromise);
   
-  // React 19 Optimistic UI hook
-  const [optimisticWatchlist, addOptimisticAction] = useOptimistic(
-    initialWatchlist,
-    (state, idToRemove) => state.filter(item => item.tmdb_id !== idToRemove)
-  );
+  // Local watchlist state derived from initial data
+  const [watchlist, setWatchlist] = useState(initialWatchlist);
+
+  useEffect(() => {
+    // Keep local state in sync if the underlying data changes (e.g., token change)
+    setWatchlist(initialWatchlist);
+  }, [initialWatchlist]);
 
   const handleRemove = async (tmdbId) => {
     if (!token) return;
     
     startTransition(() => {
-      addOptimisticAction(tmdbId);
+      setWatchlist((prev) => prev.filter((item) => item.tmdb_id !== tmdbId));
     });
 
     try {
@@ -123,7 +125,7 @@ function WatchlistContent({ watchlistPromise, filter, token }) {
     }
   };
 
-  const filteredWatchlist = optimisticWatchlist.filter((item) => {
+  const filteredWatchlist = watchlist.filter((item) => {
     if (filter === 'movies') return item.media_type === true;
     if (filter === 'tv') return item.media_type === false;
     return true;
