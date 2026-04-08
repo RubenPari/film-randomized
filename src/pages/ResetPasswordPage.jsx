@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext.jsx';
+import { validatePasswordForm } from '../shared/utils/passwordValidation';
 
 function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState('');
@@ -29,13 +30,9 @@ function ResetPasswordPage() {
     setError('');
     setSuccess('');
 
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
+    const validationError = validatePasswordForm(newPassword, confirmPassword);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
