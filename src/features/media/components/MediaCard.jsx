@@ -2,10 +2,10 @@
  * Media card component.
  * Displays detailed information about a media item including poster, title, description, and trailer.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IMAGE_BASE_URL } from '../../../shared/constants/api.js';
-import { fetchMediaVideos } from '../../../shared/services/tmdbApi.js';
+import useMediaTrailer from '../hooks/useMediaTrailer.js';
 import SaveButtons from './SaveButtons.jsx';
 
 /**
@@ -33,52 +33,13 @@ function MediaCard({ media, mediaType }) {
   const releaseDate = media.release_date || media.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : null;
 
-  // State for trailer video
-  const [trailerKey, setTrailerKey] = useState(null);
+  // Fetch trailer using custom hook
+  const trailerKey = useMediaTrailer(mediaType, media.id);
 
   // State for description expansion
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
 
   const hasLongOverview = Boolean(media.overview && media.overview.length > 280);
-
-  /**
-   * Fetches trailer video when component mounts or media changes.
-   */
-  useEffect(
-    function () {
-      const loadTrailer = async function () {
-        try {
-          const videosData = await fetchMediaVideos(mediaType, media.id);
-          const videos = videosData.results || [];
-          
-          // 1. Try to find a YouTube Trailer
-          let trailer = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
-          
-          // 2. If not found, try a Teaser
-          if (!trailer) {
-            trailer = videos.find(v => v.site === 'YouTube' && v.type === 'Teaser');
-          }
-          
-          // 3. If still not found, take the first available YouTube video (Clip, Featurette, etc.)
-          if (!trailer) {
-            trailer = videos.find(v => v.site === 'YouTube');
-          }
-
-          if (trailer) {
-            setTrailerKey(trailer.key);
-          } else {
-            setTrailerKey(null);
-          }
-        } catch (error) {
-          console.error('Error loading trailer:', error);
-          setTrailerKey(null);
-        }
-      };
-
-      loadTrailer();
-    },
-    [media.id, mediaType]
-  );
 
   return (
     <div className="media-card">
