@@ -2,13 +2,8 @@
  * Main application component with routing.
  * Sets up React Router routes and provides authentication context.
  */
-/**
- * Main application component with routing.
- * Sets up React Router routes and provides authentication context.
- */
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import './App.css';
 import { AuthProvider } from './shared/context/AuthContext.jsx';
 import ErrorBoundary from './shared/components/ErrorBoundary.jsx';
 import ProtectedRoute from './shared/components/ProtectedRoute.jsx';
