@@ -2,6 +2,8 @@
 
 Un'applicazione web moderna che ti aiuta a scoprire film e serie TV casuali in base ai tuoi gusti personali. Utilizza l'API di The Movie Database (TMDb) per fornire raccomandazioni personalizzate.
 
+Questa cartella (`film-randomized/`) è il **frontend** del monorepo; il backend **NestJS** si trova in `film-randomized-back/` nella directory padre. Per lo stack completo con Docker vedi più sotto la sezione **Docker Compose (Full Stack)**.
+
 ![React](https://img.shields.io/badge/React-19.0.0-61DAFB?style=flat&logo=react)
 ![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?style=flat&logo=vite)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-06B6D4?style=flat&logo=tailwindcss)
@@ -13,7 +15,7 @@ Un'applicazione web moderna che ti aiuta a scoprire film e serie TV casuali in b
 - **Generazione Casuale Intelligente**: Scopri film e serie TV casuali con un algoritmo che evita ripetizioni
 - **Filtri Avanzati**: Filtra per genere, valutazione (0-10), e anno di uscita
 - **Doppia Modalità**: Passa facilmente tra film e serie TV
-- **Interfaccia Italiana**: Tutte le descrizioni e i contenuti sono in italiano
+- **Internazionalizzazione**: Italiano e inglese (i18n)
 - **Design Moderno**: Interfaccia pulita e responsive con TailwindCSS
 
 ## 🚀 Quick Start
@@ -25,11 +27,11 @@ Un'applicazione web moderna che ti aiuta a scoprire film e serie TV casuali in b
 
 ### Installazione
 
-1. **Clona il repository**
+1. **Clona il repository** e entra nella cartella del frontend
 
 ```bash
 git clone <repository-url>
-cd film-randomized
+cd film-randomized-complete/film-randomized
 ```
 
 2. **Installa le dipendenze**
@@ -52,6 +54,8 @@ http://localhost:5173
 
 ## 🐳 Docker Compose (Full Stack)
 
+Lo stack Docker è definito nella **root del monorepo** (`film-randomized-complete/docker-compose.yml`), non in questa cartella.
+
 ### Prerequisiti
 
 - **Docker** installato e in esecuzione
@@ -59,34 +63,38 @@ http://localhost:5173
 
 ### Configurazione variabili d'ambiente
 
-Nella root del progetto crea un file `.env` (non viene committato) con almeno la chiave TMDb per il frontend:
+Nella **root del monorepo** (`film-randomized-complete/`) crea un file `.env` (non viene committato) con almeno:
 
 ```env
 VITE_TMDB_API_KEY=la_tua_chiave_tmdb
+JWT_SECRET=stringa_segreta_di_almeno_trentadue_caratteri
 ```
 
-> Nota: nello stack Docker Compose il backend usa automaticamente un database PostgreSQL in container (servizio `db`), **non** Neon. La stringa di connessione è già configurata nel `docker-compose.yml`.
+`JWT_SECRET` è richiesto dal backend NestJS (validazione all’avvio). Il database PostgreSQL nel servizio `db` è già cablato in `docker-compose.yml` (nessun provider esterno come Neon).
 
 ### Avvio dello stack completo
 
-Dalla root del progetto (`film-randomized/`):
+Dalla root del monorepo:
 
 ```bash
+cd film-randomized-complete
 docker compose up --build
 ```
 
 Questo comando:
 
-- avvia PostgreSQL (`db`)
-- avvia il backend FastAPI (`backend`)
-- builda e avvia il frontend React/Vite (`frontend`)
-- avvia Nginx come reverse proxy (`proxy`)
+- avvia **PostgreSQL** (`db`)
+- builda ed esegue il **backend NestJS** (`backend`, migrazioni TypeORM all’avvio, API sulla porta 8000 nella rete Docker)
+- builda il **frontend** Vite e lo serve con **Nginx** (`frontend`, porta **80** sull’host)
+
+Nginx inoltra le richieste `/api/*` al backend (vedi `nginx.conf` in questa cartella).
 
 ### URL di accesso
 
 - Applicazione web: `http://localhost`
-- API backend dirette: `http://localhost:8000`
-- Documentazione API (Swagger): `http://localhost:8000/docs`
+- API (stesso host, percorso prefissato): `http://localhost/api/…` (es. `GET /api/health`)
+
+Il backend non espone la porta 8000 sull’host di default: in sviluppo locale senza Docker usi `http://localhost:8000` dal package `film-randomized-back`.
 
 Per fermare tutto:
 
@@ -126,46 +134,29 @@ npm run format:check # Verifica la formattazione senza modificare
 
 #### APIs
 
-- **TMDb API**: Database di film e serie TV
+- **TMDb API**: film e serie TV (chiamate dal browser al build/runtime)
+- **Backend NestJS** (`../film-randomized-back/`): autenticazione, watchlist, email (fuori da questo package; in produzione Docker le chiamate passano da `/api`)
 
-### Struttura del Progetto
+### Struttura del Progetto (sintesi)
 
 ```
 film-randomized/
 ├── src/
-│   ├── components/           # Componenti React UI
-│   │   ├── GenreFilter.jsx   # Filtro per generi
-│   │   ├── MediaCard.jsx     # Card per visualizzare film/serie
-│   │   ├── MediaTypeSelector.jsx  # Selettore film/serie
-│   │   ├── RatingFilter.jsx  # Filtro per valutazione
-│   │   └── YearFilter.jsx    # Filtro per anno di uscita
-│   │
-│   ├── hooks/
-│   │   └── useMediaGenerator.js  # Hook principale per generazione media
-│   │
-│   ├── services/
-│   │   └── tmdbApi.js        # API TMDb per film/serie
-│   │
-│   ├── utils/
-│   │   └── mediaUtils.js     # Utility per filtri e validazione media
-│   │
-│   ├── constants/
-│   │   └── api.js            # Costanti API (chiave TMDb, endpoints)
-│   │
-│   ├── App.jsx               # Componente principale
-│   ├── main.jsx              # Entry point dell'app
-│   ├── App.css               # Stili globali
-│   └── index.css             # Stili base e Tailwind
-│
-├── public/                   # Asset statici
-├── index.html                # HTML principale
-├── vite.config.js            # Configurazione Vite
-├── eslint.config.js          # Configurazione ESLint
-├── tailwind.config.js        # Configurazione TailwindCSS
-├── postcss.config.js         # Configurazione PostCSS
-├── .prettierrc               # Configurazione Prettier
-├── package.json              # Dipendenze e script
-└── README.md                 # Questo file
+│   ├── features/media/       # Generazione media, filtri, card, contesto filtri
+│   ├── features/watchlist/   # Pagina e componenti watchlist
+│   ├── pages/                # HomePage, auth, NotFound, ecc.
+│   ├── shared/               # context, services (apiClient, tmdbApi), constants
+│   ├── locales/              # Traduzioni i18n (en / it)
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── public/
+├── Dockerfile                # Build Vite + Nginx (usato da docker-compose nella root del monorepo)
+├── nginx.conf
+├── vite.config.js
+├── tailwind.config.js
+├── package.json
+└── README.md
 ```
 
 ### Flusso di Dati
@@ -175,7 +166,7 @@ Filtri → useMediaGenerator → tmdbApi.discoverMedia()
                                               ↓
                     Selezione pagina casuale + fetchMediaDetails()
                                               ↓
-                    Validazione descrizione italiana + controllo duplicati
+                    Validazione descrizione + controllo duplicati
                                               ↓
                               Display MediaCard
 ```
@@ -205,7 +196,7 @@ Componenti piccoli e riutilizzabili per filtri e UI elements, garantendo manuten
 
 Attenzione: **non inserire mai la tua API key TMDb direttamente nel codice sorgente** e non committarla nel repository.
 
-In questo progetto la chiave è letta tramite variabile d'ambiente in `frontend/src/shared/constants/api.js`:
+In questo progetto la chiave è letta tramite variabile d'ambiente in `src/shared/constants/api.js`:
 
 ```javascript
 export const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -221,13 +212,13 @@ VITE_TMDB_API_KEY=la_tua_chiave_tmdb
 ```
 3. Riavvia il server di sviluppo (`npm run dev`) se era già in esecuzione.
 
-Quando usi Docker Compose, questo stesso valore viene passato automaticamente al container del frontend leggendo il file `.env` nella root.
+Quando usi Docker Compose dalla root del monorepo, `VITE_TMDB_API_KEY` viene passata al build del container frontend tramite il file `.env` in quella directory.
 
 ## 🎨 Personalizzazione
 
 ### Aggiungere Nuovi Filtri
 
-1. **Aggiungi stato in `useMediaGenerator.js`**:
+1. **Aggiungi stato in `src/features/media/hooks/useMediaGenerator.js`** (o nel hook filtri collegato):
 
 ```javascript
 const [nuovoFiltro, setNuovoFiltro] = useState(defaultValue);
@@ -246,16 +237,16 @@ const filters = {
 
 3. **Aggiorna `tmdbApi.discoverMedia()`** per costruire il parametro query
 
-4. **Crea componente UI** in `src/components/`
+4. **Crea componente UI** sotto `src/features/media/components/` (o `filters/`)
 
-5. **Aggiungi alla sezione filtri** in `App.jsx`
+5. **Aggiungi alla sezione filtri** in `FilterPanel.jsx` / `HomePage.jsx` come da struttura attuale
 
 ### Modificare Stili
 
 L'applicazione usa TailwindCSS. Per personalizzare:
 
 - **Colori/temi**: Modifica `tailwind.config.js`
-- **Stili globali**: Modifica `src/App.css` o `src/index.css`
+- **Stili globali**: Modifica `src/index.css`
 - **Componenti**: Usa classi Tailwind direttamente nei componenti
 
 ## 🧪 Testing
@@ -283,7 +274,7 @@ L'applicazione usa TailwindCSS. Per personalizzare:
 - Prova ad ampliare l'intervallo di anni o rimuovere filtri genere
 - Verifica la connessione a Internet (necessaria per TMDb API)
 
-**Media senza descrizione italiana**
+**Media senza descrizione utilizzabile**
 
 - L'algoritmo filtra automaticamente questi casi
 - Clicca "Genera Contenuto Casuale" per ottenere un altro suggerimento
