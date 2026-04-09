@@ -33,6 +33,14 @@
     "importSuccess": "Session imported successfully!",
     "importError": "Failed to import session. Please check the file."
   },
+  "session": {
+    "empty": "No content discovered yet in this session."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "goHome": "Back to home"
+  },
   "filters": {
     "mediaType": "Media Type",
     "rating": "Rating",
