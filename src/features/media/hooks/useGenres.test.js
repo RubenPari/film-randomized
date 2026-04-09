@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { useGenres } from './useGenres';
-import * as tmdbApi from '../../../shared/services/tmdbApi';
+import { useGenres } from './useGenres.js';
+import * as tmdbApi from '../../../shared/services/tmdbApi.js';
 
 // Mock the tmdbApi module
 vi.mock('../../../shared/services/tmdbApi');
@@ -20,7 +20,7 @@ describe('useGenres', () => {
     await waitFor(() => {
       expect(result.current.genres).toEqual(mockGenres);
     });
-    
+
     expect(result.current.error).toBeNull();
   });
 
@@ -30,7 +30,7 @@ describe('useGenres', () => {
     const { result } = renderHook(() => useGenres());
 
     await waitFor(() => {
-      expect(result.current.error).toBe('Error loading genres');
+      expect(result.current.error).toBe('Failed to fetch genres. Please try again later.');
     });
   });
 });

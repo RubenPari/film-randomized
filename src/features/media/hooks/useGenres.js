@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import { fetchGenres } from '../../../shared/services/tmdbApi';
+import { fetchGenres } from '../../../shared/services/tmdbApi.js';
 
 /**
- * Custom hook for fetching and managing genres.
- * Implements a simple cache mechanism to avoid redundant network requests.
- * Uses the centralized cache logic from tmdbApi.js for efficient loading.
+ * Loads genres for filter UI. Caching lives only in tmdbApi.fetchGenres (module-level).
  */
 export function useGenres() {
   const [genres, setGenres] = useState([]);
@@ -15,7 +13,7 @@ export function useGenres() {
 
     const loadGenres = async () => {
       try {
-        const data = await fetchGenres(); // Uses optimized caching from API
+        const data = await fetchGenres();
         if (isMounted) {
           setGenres(data);
         }

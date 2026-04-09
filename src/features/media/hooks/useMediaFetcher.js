@@ -5,15 +5,14 @@ import {
   discoverMedia,
   fetchMediaPage,
   fetchMediaDetails,
-} from '../../../shared/services/tmdbApi';
+} from '../../../shared/services/tmdbApi.js';
+import { MAX_GENERATION_ATTEMPTS } from '../../../shared/constants/config.js';
 import {
   filterValidMedia,
   hasValidDescription,
   getRandomPage,
   getRandomMedia,
-} from '../../../shared/utils/mediaUtils';
-
-const MAX_GENERATION_ATTEMPTS = 5;
+} from '../../../shared/utils/mediaUtils.js';
 
 export function useMediaFetcher(viewedMediaManager) {
   const { token } = useAuth();
@@ -28,9 +27,9 @@ export function useMediaFetcher(viewedMediaManager) {
     try {
       const watchlist = await fetchUserWatchlist(token);
       const { discoverUrl, totalPages } = await discoverMedia(mediaType, filters);
-      
+
       const details = await findValidRandomMedia(discoverUrl, totalPages, mediaType, watchlist, 0);
-      
+
       setRandomMedia(details);
       viewedMediaManager.addViewedMedia(details);
     } catch (err) {
@@ -56,7 +55,7 @@ export function useMediaFetcher(viewedMediaManager) {
 
     const randomPage = getRandomPage(totalPages);
     const pageData = await fetchMediaPage(discoverUrl, randomPage);
-    
+
     const activeViewedMedia = viewedMediaManager.clearViewedMediaCacheIfTooLarge();
     const filteredResults = filterValidMedia(pageData.results, activeViewedMedia, watchlist);
 
@@ -75,7 +74,7 @@ export function useMediaFetcher(viewedMediaManager) {
   };
 
   const isValidMedia = (details, watchlist) => {
-    const isInWatchlist = watchlist.some(item => item.tmdb_id === details.id);
+    const isInWatchlist = watchlist.some((item) => item.tmdb_id === details.id);
     return hasValidDescription(details) && !isInWatchlist;
   };
 

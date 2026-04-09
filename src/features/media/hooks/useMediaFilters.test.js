@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { useMediaFilters } from './useMediaFilters';
+import { useMediaFilters } from './useMediaFilters.js';
+import { MIN_RELEASE_YEAR } from '../../../shared/constants/config.js';
 
 describe('useMediaFilters', () => {
   it('should initialize with default values', () => {
@@ -10,6 +11,7 @@ describe('useMediaFilters', () => {
     expect(result.current.minRating).toBe(0);
     expect(result.current.maxRating).toBe(10);
     expect(result.current.selectedGenres).toEqual([]);
+    expect(result.current.releaseYearFrom).toBe(MIN_RELEASE_YEAR);
   });
 
   it('should toggle media type', () => {

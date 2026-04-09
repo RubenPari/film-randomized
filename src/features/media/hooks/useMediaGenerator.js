@@ -1,8 +1,8 @@
 import { useTransition } from 'react';
-import { useMediaFilters } from './useMediaFilters';
-import { useGenres } from './useGenres';
-import { useMediaFetcher } from './useMediaFetcher';
-import { useMediaHistory } from './useMediaHistory';
+import { useMediaFilters } from './useMediaFilters.js';
+import { useGenres } from './useGenres.js';
+import { useMediaFetcher } from './useMediaFetcher.js';
+import { useMediaHistory } from './useMediaHistory.js';
 
 /**
  * Custom hook for managing media generation state and logic.
@@ -11,17 +11,24 @@ import { useMediaHistory } from './useMediaHistory';
  */
 export function useMediaGenerator() {
   const {
-    mediaType, setMediaType,
-    minRating, setMinRating,
-    maxRating, setMaxRating,
-    releaseYearFrom, setReleaseYearFrom,
-    releaseYearTo, setReleaseYearTo,
-    minVoteCount, setMinVoteCount,
-    selectedGenres, handleGenreToggle,
+    mediaType,
+    setMediaType,
+    minRating,
+    setMinRating,
+    maxRating,
+    setMaxRating,
+    releaseYearFrom,
+    setReleaseYearFrom,
+    releaseYearTo,
+    setReleaseYearTo,
+    minVoteCount,
+    setMinVoteCount,
+    selectedGenres,
+    handleGenreToggle,
   } = useMediaFilters();
 
   const { genres, error: genresError } = useGenres();
-  
+
   const historyManager = useMediaHistory();
 
   const {
@@ -56,13 +63,20 @@ export function useMediaGenerator() {
   };
 
   return {
-    mediaType, setMediaType: handleMediaTypeChange,
-    minRating, setMinRating: handleMinRatingChange,
-    maxRating, setMaxRating: handleMaxRatingChange,
-    releaseYearFrom, setReleaseYearFrom: handleReleaseYearFromChange,
-    releaseYearTo, setReleaseYearTo: handleReleaseYearToChange,
-    minVoteCount, setMinVoteCount: handleMinVoteCountChange,
-    selectedGenres, handleGenreToggle: handleGenreToggleTransition,
+    mediaType,
+    setMediaType: handleMediaTypeChange,
+    minRating,
+    setMinRating: handleMinRatingChange,
+    maxRating,
+    setMaxRating: handleMaxRatingChange,
+    releaseYearFrom,
+    setReleaseYearFrom: handleReleaseYearFromChange,
+    releaseYearTo,
+    setReleaseYearTo: handleReleaseYearToChange,
+    minVoteCount,
+    setMinVoteCount: handleMinVoteCountChange,
+    selectedGenres,
+    handleGenreToggle: handleGenreToggleTransition,
     genres,
     randomMedia,
     isLoading: isFetching || isPendingFilter,

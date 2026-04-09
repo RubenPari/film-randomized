@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import { MAX_HISTORY_SIZE } from '../../../shared/constants/config.js';
 
 export function useMediaHistory() {
   const [viewedMedia, setViewedMedia] = useState([]);
 
   const addViewedMedia = (media) => {
-    setViewedMedia(prev => [...prev, media]);
+    setViewedMedia((prev) => [...prev, media]);
   };
 
   const clearViewedMediaCacheIfTooLarge = () => {
-    if (viewedMedia.length > 500) {
+    if (viewedMedia.length > MAX_HISTORY_SIZE) {
       setViewedMedia([]);
       return [];
     }
@@ -21,7 +22,9 @@ export function useMediaHistory() {
   };
 
   const createJsonDataUri = (data) => {
-    return 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2));
+    return (
+      'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2))
+    );
   };
 
   const createExportFilename = () => {
@@ -55,6 +58,6 @@ export function useMediaHistory() {
     addViewedMedia,
     clearViewedMediaCacheIfTooLarge,
     exportViewedMedia,
-    importViewedMedia
+    importViewedMedia,
   };
 }
