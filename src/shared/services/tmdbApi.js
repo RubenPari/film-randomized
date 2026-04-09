@@ -3,6 +3,7 @@
  * Handles all interactions with The Movie Database API
  */
 import { API_ENDPOINTS } from '../constants/api.js';
+import { TMDB_MAX_PAGE } from '../constants/config.js';
 import { tmdbClient, TmdbError } from './tmdbClient.js';
 
 /**
@@ -32,11 +33,17 @@ export const discoverMedia = async (mediaType, filters) => {
   }
 
   if (filters.releaseYearFrom) {
-    urlParams.append(mediaType ? 'primary_release_date.gte' : 'first_air_date.gte', `${filters.releaseYearFrom}-01-01`);
+    urlParams.append(
+      mediaType ? 'primary_release_date.gte' : 'first_air_date.gte',
+      `${filters.releaseYearFrom}-01-01`
+    );
   }
 
   if (filters.releaseYearTo) {
-    urlParams.append(mediaType ? 'primary_release_date.lte' : 'first_air_date.lte', `${filters.releaseYearTo}-12-31`);
+    urlParams.append(
+      mediaType ? 'primary_release_date.lte' : 'first_air_date.lte',
+      `${filters.releaseYearTo}-12-31`
+    );
   }
 
   if (filters.minVoteCount > 0) {
@@ -51,7 +58,7 @@ export const discoverMedia = async (mediaType, filters) => {
 
   return {
     discoverUrl: `${endpoint}?${urlParams.toString()}`,
-    totalPages: Math.min(data.total_pages, 500),
+    totalPages: Math.min(data.total_pages, TMDB_MAX_PAGE),
   };
 };
 
@@ -106,7 +113,10 @@ export const fetchMediaVideos = async (mediaType, mediaId) => {
   return data;
 };
 
-// Global cache for genres to avoid repetitive network requests across components
+/**
+ * Single source of truth for genre list: one in-memory cache + one in-flight promise.
+ * Hooks (e.g. useGenres) must call fetchGenres only — do not duplicate caching there.
+ */
 let cachedGenres = null;
 let cachedGenresPromise = null;
 
@@ -126,7 +136,7 @@ export const fetchGenres = async () => {
       try {
         const [movieData, tvData] = await Promise.all([
           tmdbClient.get(API_ENDPOINTS.movieGenres),
-          tmdbClient.get(API_ENDPOINTS.tvGenres)
+          tmdbClient.get(API_ENDPOINTS.tvGenres),
         ]);
 
         const uniqueGenresMap = new Map();
@@ -141,7 +151,9 @@ export const fetchGenres = async () => {
           }
         });
 
-        cachedGenres = Array.from(uniqueGenresMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        cachedGenres = Array.from(uniqueGenresMap.values()).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
         return cachedGenres;
       } catch (error) {
         cachedGenresPromise = null; // Reset promise on error so it can be retried
