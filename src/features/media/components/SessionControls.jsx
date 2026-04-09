@@ -4,6 +4,7 @@
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SESSION_MESSAGE_TIMEOUT_MS } from '../../../shared/constants/config.js';
 
 /**
  * Session controls component.
@@ -37,7 +38,7 @@ function SessionControls({ viewedMedia, exportViewedMedia, importViewedMedia }) 
         setImportMessage({ text: t('home.importError'), type: 'error' });
       }
       // Reset message after 3 seconds
-      setTimeout(() => setImportMessage({ text: '', type: '' }), 3000);
+      setTimeout(() => setImportMessage({ text: '', type: '' }), SESSION_MESSAGE_TIMEOUT_MS);
     };
     reader.readAsText(file);
     // Reset input
@@ -59,16 +60,26 @@ function SessionControls({ viewedMedia, exportViewedMedia, importViewedMedia }) 
             onClick={exportViewedMedia}
             disabled={viewedMedia.length === 0}
             className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-2 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={viewedMedia.length === 0 ? "Generate content first to export" : ""}
+            title={viewedMedia.length === 0 ? 'Generate content first to export' : ''}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
             </svg>
             {t('home.exportSession')}
           </button>
           <label className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-2 hover:bg-slate-700 cursor-pointer">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
             </svg>
             {t('home.importSession')}
             <input type="file" accept=".json" onChange={handleImport} className="hidden" />
@@ -78,9 +89,13 @@ function SessionControls({ viewedMedia, exportViewedMedia, importViewedMedia }) 
 
       {/* Import feedback message */}
       {importMessage.text && (
-        <div className={`mb-4 p-3 rounded-lg text-sm text-center animate-fade-in ${
-          importMessage.type === 'success' ? 'bg-green-900/40 text-green-200' : 'bg-red-900/40 text-red-200'
-        }`}>
+        <div
+          className={`mb-4 p-3 rounded-lg text-sm text-center animate-fade-in ${
+            importMessage.type === 'success'
+              ? 'bg-green-900/40 text-green-200'
+              : 'bg-red-900/40 text-red-200'
+          }`}
+        >
           {importMessage.text}
         </div>
       )}
@@ -124,9 +139,7 @@ function SessionControls({ viewedMedia, exportViewedMedia, importViewedMedia }) 
           })}
         </div>
       ) : (
-        <div className="text-center py-4 text-gray-500 text-sm italic">
-          No content discovered yet in this session.
-        </div>
+        <div className="text-center py-4 text-gray-500 text-sm italic">{t('session.empty')}</div>
       )}
     </div>
   );

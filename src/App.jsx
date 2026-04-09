@@ -14,11 +14,12 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ChangePasswordPage from './pages/ChangePasswordPage.jsx';
 import WatchlistPage from './features/watchlist/WatchlistPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 
 /**
  * Root application component.
  * Configures routes and wraps app in authentication provider and error boundary.
- * 
+ *
  * @returns {JSX.Element} Application with routing
  */
 function App() {
@@ -54,6 +55,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </ErrorBoundary>

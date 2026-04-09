@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * Component for filtering media by rating range (min and max).
- * 
+ *
  * @param {Object} props - Component props
  * @param {number} props.minRating - Minimum rating value (0-10)
  * @param {number} props.maxRating - Maximum rating value (0-10)
@@ -48,8 +48,10 @@ function RatingFilter({ minRating, maxRating, setMinRating, setMaxRating }) {
               max="10"
               step="0.5"
               value={minRating}
-              onChange={function(e) { setMinRating(parseFloat(e.target.value)); }}
-              className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-cyan-500 [&::-webkit-slider-thumb]:to-blue-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-cyan-500/50 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+              onChange={function (e) {
+                setMinRating(parseFloat(e.target.value));
+              }}
+              className="rating-slider"
             />
             <span className="text-xs text-gray-500 font-medium">10</span>
           </div>
@@ -68,8 +70,10 @@ function RatingFilter({ minRating, maxRating, setMinRating, setMaxRating }) {
               max="10"
               step="0.5"
               value={maxRating}
-              onChange={function(e) { setMaxRating(parseFloat(e.target.value)); }}
-              className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-cyan-500 [&::-webkit-slider-thumb]:to-blue-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-cyan-500/50 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+              onChange={function (e) {
+                setMaxRating(parseFloat(e.target.value));
+              }}
+              className="rating-slider"
             />
             <span className="text-xs text-gray-500 font-medium">10</span>
           </div>

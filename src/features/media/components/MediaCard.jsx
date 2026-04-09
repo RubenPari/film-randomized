@@ -5,13 +5,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IMAGE_BASE_URL } from '../../../shared/constants/api.js';
+import { OVERVIEW_MAX_LENGTH } from '../../../shared/constants/config.js';
 import useMediaTrailer from '../hooks/useMediaTrailer.js';
 import SaveButtons from './SaveButtons.jsx';
 
 /**
  * Component for displaying detailed information about a media item.
  * Shows poster, title, description, rating, genres, and optional trailer video.
- * 
+ *
  * @param {Object} props - Component props
  * @param {Object} props.media - Media object with details to display
  * @param {number} props.media.id - TMDB ID of the media
@@ -39,7 +40,7 @@ function MediaCard({ media, mediaType }) {
   // State for description expansion
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(false);
 
-  const hasLongOverview = Boolean(media.overview && media.overview.length > 280);
+  const hasLongOverview = Boolean(media.overview && media.overview.length > OVERVIEW_MAX_LENGTH);
 
   return (
     <div className="media-card">
