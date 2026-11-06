@@ -87,7 +87,7 @@ Questo comando:
 - builda ed esegue il **backend NestJS** (`backend`, migrazioni TypeORM all’avvio, API sulla porta 8000 nella rete Docker)
 - builda il **frontend** Vite e lo serve con **Nginx** (`frontend`, porta **80** sull’host)
 
-Nginx inoltra le richieste `/api/*` al backend (vedi `nginx.conf` in questa cartella).
+Nginx inoltra le richieste `/api/*` al backend (vedi `nginx/default.conf.template` in questa cartella; URL del backend configurabile con la variabile `BACKEND_URL`, default `http://backend:8000`).
 
 ### URL di accesso
 
@@ -151,8 +151,9 @@ film-randomized/
 │   ├── main.jsx
 │   └── index.css
 ├── public/
-├── Dockerfile                # Build Vite + Nginx (usato da docker-compose nella root del monorepo)
-├── nginx.conf
+├── .github/workflows/        # CI/CD: deploy su Google Cloud Run
+├── Dockerfile                # Build Vite + Nginx (docker-compose e Cloud Run)
+├── nginx/default.conf.template  # Config Nginx (PORT e BACKEND_URL via env)
 ├── vite.config.js
 ├── tailwind.config.js
 ├── package.json
@@ -324,13 +325,76 @@ npm run build
 
 I file ottimizzati saranno generati nella cartella `dist/`.
 
-### Deploy su Vercel/Netlify
+### Deploy su Google Cloud Run (GitHub Actions)
 
-1. Connetti il repository GitHub
-2. Configura build command: `npm run build`
-3. Configura output directory: `dist`
-4. Aggiungi variabili d'ambiente se necessario
-5. Deploy!
+Il workflow `.github/workflows/deploy-gcp.yml` ad ogni push su `master` (o manualmente con *Run workflow*):
+
+1. esegue lint e test
+2. builda l'immagine Docker (con `VITE_TMDB_API_KEY` come build-arg) e la pubblica su Artifact Registry
+3. deploya su Cloud Run passando `BACKEND_URL` come variabile d'ambiente
+
+A runtime Nginx ascolta su `$PORT` (Cloud Run usa 8080) e inoltra `/api/*` a `$BACKEND_URL`, quindi il frontend resta same-origin col backend (nessuna configurazione CORS aggiuntiva).
+
+> Il backend NestJS va deployato **prima** su un servizio Cloud Run separato; il suo URL (`https://…run.app`) va in `BACKEND_URL`.
+
+#### Setup GCP (una tantum)
+
+```bash
+PROJECT_ID=il-tuo-progetto
+REGION=europe-west1
+REPO=film-randomized
+GITHUB_REPO=RubenPari/film-randomized
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
+
+gcloud config set project $PROJECT_ID
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com \
+  iamcredentials.googleapis.com sts.googleapis.com
+
+# Repository Docker
+gcloud artifacts repositories create $REPO --repository-format=docker --location=$REGION
+
+# Service account per il deploy
+gcloud iam service-accounts create github-deployer --display-name="GitHub deployer"
+SA=github-deployer@$PROJECT_ID.iam.gserviceaccount.com
+for role in roles/run.admin roles/artifactregistry.writer roles/iam.serviceAccountUser; do
+  gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SA" --role=$role
+done
+
+# Workload Identity Federation (nessuna chiave JSON)
+gcloud iam workload-identity-pools create github --location=global --display-name="GitHub"
+gcloud iam workload-identity-pools providers create-oidc github-provider \
+  --location=global --workload-identity-pool=github \
+  --issuer-uri="https://token.actions.githubusercontent.com" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
+  --attribute-condition="assertion.repository=='$GITHUB_REPO'"
+gcloud iam service-accounts add-iam-policy-binding $SA \
+  --role=roles/iam.workloadIdentityUser \
+  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/attribute.repository/$GITHUB_REPO"
+
+# Valore per il secret GCP_WORKLOAD_IDENTITY_PROVIDER
+echo "projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/github-provider"
+```
+
+#### Configurazione GitHub (Settings → Secrets and variables → Actions)
+
+| Tipo     | Nome                             | Esempio                                                  |
+| -------- | -------------------------------- | -------------------------------------------------------- |
+| Variable | `GCP_PROJECT_ID`                 | `il-tuo-progetto`                                        |
+| Variable | `GCP_REGION`                     | `europe-west1`                                           |
+| Variable | `GAR_REPOSITORY`                 | `film-randomized`                                        |
+| Variable | `CLOUD_RUN_SERVICE`              | `film-randomized-web`                                    |
+| Variable | `BACKEND_URL`                    | `https://film-randomized-back-xxxx.europe-west1.run.app` |
+| Secret   | `GCP_WORKLOAD_IDENTITY_PROVIDER` | output dell'ultimo comando sopra                         |
+| Secret   | `GCP_SERVICE_ACCOUNT`            | `github-deployer@il-tuo-progetto.iam.gserviceaccount.com` |
+| Secret   | `VITE_TMDB_API_KEY`              | la tua chiave TMDb                                       |
+
+#### Test locale dell'immagine Cloud Run
+
+```bash
+docker build --build-arg VITE_TMDB_API_KEY=la_tua_chiave -t film-randomized-web .
+docker run --rm -p 8080:8080 -e PORT=8080 -e BACKEND_URL=https://<backend>.run.app film-randomized-web
+curl http://localhost:8080/healthz   # ok
+```
 
 ### Note Importanti
 
